@@ -1615,7 +1615,7 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
         }
 
         function getScoreEmoji(score, maxScore) {
-            if (maxScore === 0) return '🤔';
+            if (maxScore === 0) return '�';
             const percentage = (score / maxScore) * 100;
             if (percentage >= 80) return '🏆';
             if (percentage >= 51) return '👍';
@@ -1867,7 +1867,11 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`API request failed with status ${response.status}`);
+                    let errorMsg = `API request failed with status ${response.status}.`;
+                    if(response.status === 403) {
+                        errorMsg += " This is often due to API key restrictions. Please check your key's permissions for the domain you are using (e.g., github.io).";
+                    }
+                    throw new Error(errorMsg);
                 }
 
                 const result = await response.json();
@@ -1891,7 +1895,7 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
                     
                     if (generatedData.questions && Array.isArray(generatedData.questions)) {
                         generatedData.questions.forEach((q, index) => {
-                             if(q && q.options && q.options.a){ // Check if question and options are valid
+                             if(q && q.options && q.options.a && q.options.b && q.options.c && q.options.d){ // Check if question and options are valid
                                 scenarioHTML += `
                                     <div class="my-4 p-4 bg-gray-800 rounded-lg">
                                         <h5 class="font-semibold text-gray-200 mb-2">${index + 1}. ${q.question}</h5>
@@ -1959,3 +1963,4 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
     </script>
 </body>
 </html>
+�
