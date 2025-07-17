@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Auditing MCQ Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            padding-bottom: 80px; /* Add padding to the bottom to avoid content being hidden by the footer */
+        }
+        .case-scenario {
+            max-height: 200px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4a5568 #2d3748;
+        }
+        .case-scenario::-webkit-scrollbar {
+            width: 8px;
+        }
+        .case-scenario::-webkit-scrollbar-track {
+            background: #2d3748;
+        }
+        .case-scenario::-webkit-scrollbar-thumb {
+            background-color: #4a5568;
+            border-radius: 10px;
+            border: 2px solid #2d3748;
+        }
+        .option-label {
+            transition: all 0.2s ease-in-out;
+        }
+        .option-label:hover {
+            background-color: #374151;
+        }
+        .correct-answer {
+            background-color: #10B981; /* Green */
+            border: 2px solid #059669;
+        }
+        .incorrect-answer {
+            background-color: #EF4444; /* Red */
+            border: 2px solid #DC2626;
+        }
+        .selected-incorrect {
+             background-color: #F87171; /* Lighter Red */
+             border: 2px solid #EF4444;
+        }
+        .gemini-btn {
+            background-color: #8b5cf6;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .gemini-btn:hover {
+            background-color: #7c3aed;
+        }
+        .gemini-btn:disabled {
+            background-color: #a78bfa;
+            cursor: not-allowed;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #8b5cf6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4">
+
+    <div id="quiz-container" class="w-full max-w-4xl mx-auto">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="text-center bg-gray-800 p-8 rounded-2xl shadow-2xl">
+            <h1 class="text-4xl font-bold text-white mb-4">Advanced Auditing & Ethics MCQ Test</h1>
+            <p class="text-lg text-gray-400 mb-2">Practice from a massive library of randomized questions.</p>
+            <p class="text-lg text-gray-400 mb-6">Now with ✨ AI-powered explanations and scenario generation!</p>
+            <button id="start-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
+                Start Test
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden bg-gray-800 p-6 md:p-8 rounded-2xl shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-indigo-400">Question <span id="question-number"></span>/<span id="total-questions"></span></h2>
+                <div class="flex items-center gap-4">
+                    <div id="timer" class="text-2xl font-bold text-yellow-400">00:00</div>
+                    <div class="text-xl font-semibold bg-gray-700 px-4 py-2 rounded-lg">Score: <span id="score">0</span></div>
+                </div>
+            </div>
+
+            <div id="case-scenario-container" class="mb-6">
+                <h3 class="text-xl font-semibold mb-2 text-gray-300">Case Scenario</h3>
+                <div id="case-scenario-text" class="case-scenario bg-gray-900 p-4 rounded-lg border border-gray-700 text-gray-300 text-sm"></div>
+            </div>
+
+            <div id="question-container">
+                <p id="question-text" class="text-lg font-medium mb-6"></p>
+                <div id="options-container" class="space-y-4"></div>
+            </div>
+
+            <div class="flex justify-between mt-8">
+                <button id="prev-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition">Previous</button>
+                <button id="submit-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition">Submit Test</button>
+                <button id="next-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition">Next</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden bg-gray-800 p-8 rounded-2xl shadow-2xl text-center">
+            <h2 class="text-4xl font-bold text-white mb-4">Test Complete!</h2>
+            <p class="text-2xl text-gray-300 mb-2">Your Final Score:</p>
+            <p class="text-6xl font-extrabold text-indigo-400 mb-2"><span id="final-score-emoji"></span> <span id="final-score"></span> / <span id="final-total-score"></span></p>
+            <p class="text-lg text-gray-400 mb-8">You answered <span id="answered-count"></span> questions in <span id="time-taken"></span>.</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <button id="review-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
+                    Review Answers
+                </button>
+                 <button id="get-feedback-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
+                    ✨ Get AI Feedback
+                </button>
+                 <button id="new-test-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
+                    Start New Test
+                </button>
+            </div>
+             <!-- Gemini Feature: AI Feedback -->
+            <div id="feedback-container" class="mt-6 text-left hidden bg-gray-900 p-6 rounded-lg border border-gray-700">
+                <!-- AI Feedback will appear here -->
+            </div>
+
+            <!-- Gemini Feature: Generate New Scenario -->
+            <div id="gemini-scenario-generator" class="mt-10 pt-6 border-t border-gray-700">
+                <h3 class="text-2xl font-bold text-white mb-4">Practice More with AI ✨</h3>
+                <p class="text-gray-400 mb-4">Select a topic to generate a new case scenario and questions.</p>
+                <div class="flex justify-center items-center gap-4">
+                    <select id="topic-selector" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-2.5">
+                        <option>Quality Control</option>
+                        <option>General Auditing Principles and Auditors' Responsibilities</option>
+                        <option>Audit Planning, Strategy, and Execution</option>
+                        <option>Materiality, Risk Assessment, and Internal Control</option>
+                        <option>Audit Evidence</option>
+                        <option>Completion and Review</option>
+                        <option>Reporting</option>
+                        <option>Specialised Areas</option>
+                        <option>Related Services</option>
+                        <option>Review of Financial Information</option>
+                        <option>Prospective Financial Information and Other Assurance Services</option>
+                        <option>Digital Auditing & Assurance</option>
+                        <option>Group Audits</option>
+                        <option>Audit of Banks & Non-Banking Financial Companies</option>
+                        <option>Audit of Public Sector Undertakings</option>
+                        <option>Internal Audit</option>
+                        <option>Due Diligence, Investigation & Forensic Accounting</option>
+                        <option>ESG Assurance</option>
+                        <option>Professional Ethics & Liabilities of Auditors</option>
+                    </select>
+                    <button id="generate-scenario-btn" class="gemini-btn">Generate Scenario</button>
+                </div>
+                <div id="new-scenario-container" class="mt-6 text-left hidden bg-gray-900 p-6 rounded-lg border border-gray-700">
+                    <!-- Generated content will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Screen -->
+        <div id="review-screen" class="hidden w-full max-w-4xl mx-auto">
+             <h2 class="text-3xl font-bold text-center mb-6 text-white">Answer Review</h2>
+             <div id="review-content" class="space-y-8"></div>
+             <div class="text-center mt-8">
+                <button id="restart-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
+                    Restart Test
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Creator Attribution Footer -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-gray-900 bg-opacity-80 backdrop-blur-sm p-2">
+        <div class="flex items-center justify-center gap-2">
+            <p class="text-sm text-gray-500 font-bold">Created by Pradeep Kumar</p>
+            <a href="https://www.linkedin.com/in/pradeepkumar-m12" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                </svg>
+            </a>
+        </div>
+    </footer>
+
+
+    <script>
+        // --- DATA ---
+        let quizData = [
+            // Case Scenario 1
+            {
+                case: `MINSAN Ltd., an unlisted company in South India, is engaged in the business of spice oil extraction. Total paid up capital of the company is 9 crore. The company is using conventional methods for extraction of oil from spices. This requires more human intervention and hence, the cost of production is high as compared to innovative method used by other new companies. Though the company had significant growth in the past years, it has not done well over the last two financial years due to competition. A new competitor viz, Natural Extracts Ltd, had come in the market during the year 2022 and by the end of March, 2023, they captured around 75% of market share by offering the product at a reduced price. In order to reduce cost of production and thereby re-capture the market, the management of MINSAN Ltd. has planned to erect a new plant with an automatic machine. The company approached SA Bank Ltd. for a term loan of 80 lakh. During the audit for the year 2023-24, the audit team submitted findings including a lawsuit by a material supplier (PX Ltd.) for ₹3 crore, a show cause notice from the State Pollution Control Board, and three instances of fraud by employees totaling ₹1.02 crore.`,
+                topic: "Going Concern (SA 570)",
+                question: "As per SA 570, which of the following audit procedures should NOT be performed to assess whether MINSAN Ltd is a going concern or not?",
+                options: { a: "Analysis and discussion with the management of the company to find out whether installation of new plant and machinery would enable the company to reduce the cost of production.", b: "Inquire the company's legal counsel regarding existence of legal litigation and claim against the company, reasonableness of management assessments of their outcome and estimate of their financial implication.", c: "Evaluating management's future plan and strategy to increase the market share of the product.", d: "Analysis and discuss the company's cash flow and profit of the previous years with the projected accounts." },
+                answer: "d",
+                reason: "As per SA 570, analyzing and discussing the company's past cash flow and profit with projected accounts is not a primary procedure for assessing the going concern assumption. The other options are relevant procedures."
+            },
+            {
+                case: `MINSAN Ltd., an unlisted company in South India, is engaged in the business of spice oil extraction... The company has made an estimate for allowance of debtors @ 5%.`,
+                topic: "Audit Evidence",
+                question: "The company has made an estimate for allowance of debtors @ 5%. As per SA 540, which among the following may have higher estimate uncertainty and higher risk?",
+                options: { a: "Judgments about the outcome of pending litigation with PX Ltd. against the company.", b: "Estimates made for inventory obsolescence that are frequently made and updated.", c: "A model used to measure the accounting estimates is well known and the assumptions to the model are observable in the marketplace.", d: "Accounting estimate made for allowance for doubtful debts where the result of the auditors' review of similar accounting estimates made in the prior period financial statements do not indicate any substantial difference between the original accounting estimate and the actual outcome." },
+                answer: "a",
+                reason: "As per SA 540, 'Judgments about the outcome of pending litigation' is an example of an accounting estimate that may have high estimation uncertainty. This uncertainty stems from several factors inherent in the legal process."
+            },
+            {
+                case: `MINSAN Ltd., an unlisted company in South India... The audit team submitted findings including a lawsuit by a material supplier (PX Ltd.) for ₹3 crore... The company in the notes accompanying its financial statements disclosed the existence of the suit filed against the company with full details.`,
+                topic: "Reporting",
+                question: "Based on the audit evidence obtained, it is necessary to draw user's attention to the matter... In this situation, which of the following reporting option would be correct if the auditor is satisfied with the conclusions reached by the management and this matter is fundamental to the reader of financial statements?",
+                options: { a: "Include an Emphasis of Matter paragraph in the Auditors report having a clear reference to the matter being emphasized and issue a qualified opinion.", b: "Include in the Basis for Adverse opinion paragraph and issue an adverse opinion having a clear reference to the matter referred to in the notes on accounts.", c: "Include in the Basis for Disclaimer of opinion paragraph having a clear reference to the matter and issue a disclaimer opinion.", d: "Include an Emphasis of Matter Paragraph in the Auditors report having a clear reference to the matter being emphasized and to where relevant disclosures that fully describe the matter can be found in the financial statements." },
+                answer: "d",
+                reason: "As per SA 706, if the auditor considers it necessary to draw users' attention to a matter presented in the financial statement and the auditor would not be required to modify the opinion, he gives Emphasis of Matter paragraph with a clear reference to the matter being emphasized and to where relevant disclosures that fully describe the matter can be found in the financial statement."
+            },
+            {
+                case: `MINSAN Ltd. got a show cause notice from State Pollution Control Board.`,
+                topic: "General Auditing Principles and Auditors' Responsibilities",
+                question: "As per SA 250, the auditor shall perform the audit procedures to help identify instances of non-compliance... As the audit team of the company became aware of information concerning an instance of non-compliance with law, what would not be the audit procedure to be performed?",
+                options: { a: "Understand the nature of the act and circumstances in which it has occurred and obtain further information to evaluate the possible effect on the financial statement.", b: "Discuss the matter with management and if they do not provide sufficient information; and if the effect of non-compliance seems to be material, legal advice may be obtained.", c: "Monitoring legal requirements and compliance with code of conduct and ensuring that operating procedures are designed to assist in the prevention of non-compliance with law and regulation and report accordingly.", d: "Evaluate the implication of non-compliance in relation to other aspects of audit including risk assessment and reliability of written representation and take appropriate action." },
+                answer: "c",
+                reason: "Monitoring legal requirements and ensuring operating procedures are designed to prevent non-compliance is a responsibility of management, not a specific audit procedure performed by the auditor upon discovery of non-compliance as per SA 250."
+            },
+            {
+                case: `MINSAN Ltd. had availed some amount of loan for new plant and machinery during the year under audit. Out of the total loan sanctioned an amount of 25 lakh was earmarked for the purchase of the machinery-Oil Extractor, but the company has acquired an improved model of machinery, viz, Oil extractor with Dryer instead.`,
+                topic: "CARO, 2020",
+                question: "State which of the reporting option would be correct.",
+                options: { a: "State the fact in the CARO report that out of term loan taken for machinery-Oil Extractor, 25 lakh was not utilized for acquiring the machinery for which it was sanctioned.", b: "Ask the management to change terms and condition of term loan as the company has acquired a different machinery. Report under CARO, if the management does not agree with the demand.", c: "State the fact in the CARO report that the term loan taken has been applied for the purpose for which it was sanctioned.", d: "State the fact in the CARO report that the term loan taken has not been applied for the purpose for which it was sanctioned. Also qualify the report as there are misstatements that are material but not pervasive." },
+                answer: "c",
+                reason: "As per clause (ix) of Para 3 of CARO, 2020, the auditor is required to report that whether term loans were applied for the purpose for which the loans were obtained. Since the machinery acquired is an improved version for the same purpose, it is considered applied for the purpose it was sanctioned."
+            },
+            {
+                case: "The Kranti Bank Ltd. was having 150 branches all over India by the year ending 31st March, 2024. 10 branches of the bank were already covered for concurrent audit and the Bank's Audit Committee decided to include the below mentioned branches for concurrent audit from the year 2023-24. (i) Moradabad branch which started foreign exchange business from December 2023. (ii) Ludhiana branch whose aggregate deposits were more than 45% of the aggregate deposits of the bank. (iii) Mumbai branch which deals in treasury functions like investments and inter bank borrowings but not in bill re-discounting. Mishty and Associates, Chartered Accountants were appointed as the stock auditors by the Bank's audit committee for ten branches for year 2023-24. The Bank's management appointed and fixed the remuneration of Mishty and Associates, Chartered Accountants as the statutory auditors also for the year 2023-24, for the same ten branches for which they were given the assignment of stock audit.",
+            topic: "Bank Audit",
+            question: "Mishty and Associates, Chartered Accountants were already appointed for stock audit by the audit committee for the ten branches, so whether Mishty and Associates, Chartered Accountants are authorised to accept the appointment as statutory auditors for the same branches? Select the correct option from the following:",
+            options: {
+            "a": "Mishty and Associates, Chartered Accountants can accept the appointment as they were already appointed for the stock audit of those branches by the audit committee.",
+            "b": "Mishty and Associates, Chartered Accountants can accept the appointment as they have been appointed statutory auditors for the same ten branches for which they were conducting stock audit.",
+            "c": "Mishty and Associates, Chartered Accountants cannot accept the appointment as the audit firms should not undertake statutory audit assignment while they are associated with internal assignments in the Bank during the same year.",
+            "d": "Mishty and Associates, Chartered Accountants cannot accept the appointment as it was not offered by the audit committee and Bank's management is not authorised to appoint the auditors."
+        },
+        answer: "c",
+       reason: "Internal Assignments in banks by statutory auditors: The RBI decided that the audit firms should not undertake statutory audit assignments simultaneously when they are associated with internal assignments in the bank during the same year."
+            },
+            {
+                
+case: "MINSAN Ltd., an unlisted company in South India, is engaged in the business of spice oil extraction. Total paid up capital of the company is 9 crore. The company is using conventional methods for extraction of oil from spices. This requires more human intervention and hence, the cost of production is high as compared to innovative method used by other new companies. Though the company had significant growth in the past years, it has not done well over the last two financial years due to competition. A new competitor viz, Natural Extracts Ltd, had come in the market during the year 2022 and by the end of March, 2023, they captured around 75% of market share by offering the product at a reduced price. In order to reduce cost of production and thereby re-capture the market, the management of MINSAN Ltd. has planned to erect a new plant with an automatic machine. The company approached SA Bank Ltd. for a term loan of 80 lakh. During the audit for the year 2023-24, the audit team submitted findings including a lawsuit by a material supplier (PX Ltd.) for ₹3 crore, a show cause notice from the State Pollution Control Board, and three instances of fraud by employees totaling ₹1.02 crore.",
+topic: "Going Concern (SA 570)",
+question: "Though the company had significant growth in the past years, it has not done well over the last two financial years. As per SA 570, there are certain events or conditions that individually or collectively may cast significant doubt about the going concern assumptions. In order to assess whether MINSAN Ltd is a going concern or not, which of the following audit procedures should NOT be performed?",
+options: {
+            "a": "Analysis and discussion with the management of the company to find out whether installation of new plant and machinery would enable the company to reduce the cost of production.",
+            "b": "Inquire the company's legal counsel regarding existence of legal litigation and claim against the company, reasonableness of management assessments of their outcome and estimate of their financial implication.",
+            "c": "Evaluating management's future plan and strategy to increase the market share of the product.",
+            "d": "Analysis and discuss the company's cash flow and profit of the previous years with the projected accounts."
+        },
+        answer: "d",
+        reason: "As per SA 570, the procedure, 'Analysis and discuss the company's cash flow and profit of the previous years with the projected accounts' is not related to assessing whether an entity is a going concern. All other options are audit procedures to be performed."
+    },
+    {
+case: "MINSAN Ltd., an unlisted company in South India, is engaged in the business of spice oil extraction... The Company has made an estimate for allowance of debtors @5%.",
+topic: "Auditing Accounting Estimates (SA 540)",
+question: "Company has made an estimate for allowance of debtors @ 5%. Some financial statement items cannot be measured precisely but can only be estimated. The nature and reliability of information available to management to support the making of an accounting estimate varies widely, which thereby affects the degree of estimating uncertainty associated with accounting estimates. Please advise which among the following may have higher estimate uncertainty and higher risk as per SA 540?",
+options: {
+            "a": "Judgments about the outcome of pending litigation with PX Ltd. against the company.",
+            "b": "Estimates made for inventory obsolescence that are frequently made and updated.",
+            "c": "A model used to measure the accounting estimates is well known and the assumptions to the model are observable in the marketplace.",
+            "d": "Accounting estimate made for allowance for doubtful debts where the result of the auditors' review of similar accounting estimates made in the prior period financial statements do not indicate any substantial difference between the original accounting estimate and the actual outcome."
+        },
+        answer: "a",
+        reason: "As per SA 540, 'Judgments about the outcome of pending litigation' is an example of accounting estimates that may have high estimation uncertainty. This uncertainty stems from several factors inherent in the legal process, including the complexity of the case, the nuances of the applicable laws, and the variability in judicial interpretations."
+    },
+    {
+case: "XY & Associates, Chartered Accountants, have been appointed as auditors of ABC Enterprises, a company that obtained a license from the Central Government to promote cricket in rural areas of India. The company's average annual profit is estimated to be around 45 lakh. This profit would not be distributed as dividends to shareholders but is applied toward its objective of promoting sports in the country. During the audit for the financial year 2023-24, the following observations were made: The company did not maintain proper records for its fixed assets, valued at approximately ₹1.80 crore. Physical verification of the assets had not been conducted at regular intervals. The last verification occurred on 31st August 2022. Due to these observations, the auditors decided to report on the issues in the Companies (Auditor's Report) Order (CARO). However, the management disagreed, arguing that the issues should not be reported. After discussions, XY & Associates ultimately decided not to report the issues.",
+topic: "CARO, 2020",
+question: "Was the decision of XY & Associates not to report the issues of ABC Enterprises in CARO, 2020 justified? If so, under what reason?",
+options: {
+            "a": "No. CARO, 2020 is applicable to ABC Enterprises. Hence, the issues must be reported under clause (i) of CARO.",
+            "b": "Yes. CARO, 2020 is not applicable to ABC Enterprises, hence, the issues do not need to be reported.",
+            "c": "No. As per SA 240, the auditor must maintain professional skepticism, especially concerning issues related to fixed assets, and the issues must be reported.",
+            "d": "Yes. As per SA 320, the auditor may choose whether or not to report the issues after considering their materiality."
+        },
+        answer: "b",
+        reason: "The CARO, 2020 specifically exempts a company licensed to operate under section 8 of the Companies Act, 2013."
+    },
+    {
+case: "During the audit of ST Bank Ltd., a difference of opinion arose regarding the amount and items that should be disclosed under the head contingent liabilities. Additionally, the auditors made the following observations: 59 agricultural loan accounts (guaranteed by the Government of Uttar Pradesh) amounting to 29 lakh were overdue for more than two years. 73 agricultural loan accounts (guaranteed by the Government of India) amounting to 25 lakh were overdue for more than two years. 6 corporate loan accounts (guaranteed three each by the Government of India and Government of Uttar Pradesh) amounting to 25 lakh each were overdue for more than three months and a half month.",
+topic: "NPA Classification",
+question: "What is the total amount of loans that should be classified as NPA by ST Bank?",
+options: {
+            "a": "79 lakh.",
+            "b": "100 lakh.",
+            "c": "204 lakh.",
+            "d": "104 lakh."
+        },
+        answer: "d",
+        reason: "With respect to the circular issues by RBI on verification of provision for non-performing assets, if government guaranteed advance becomes NPA, for the purpose of asset classification, credit facility backed by Central Government Guarantee, though overdue, need not be treated as NPA until the Central government repudiates its guarantee. This exception is not applicable for the State Government guarantee. Therefore, in this case all the loan accounts guaranteed by the Government of Delhi should be classified as NPA. [Amount of NPA= 29 lakhs + (3 * 25 lakhs) = 104 lakhs.]"
+    },
+    {
+case: "CA Love and CA Kush are close friends and are into practice as sole proprietors. Both decided to expand their focus on taking up more assignments in the field of Goods & Services Tax. On the back of the same, they both decided to conduct a joint training session for their clients on GST and decided to share the total fee collected thereof. They invited another CA from their professional circle to join the initiative. However, the person declined the same informing that this act was against professional ethics and would lead to disciplinary action from ICAI.",
+topic: "Professional Ethics",
+question: "Whether the act of conducting joint training session on GST by CA Love & Kush and sharing of the fee collected leads to professional misconduct as per the Chartered Accountants Act 1949?",
+options: {
+            "a": "Yes, as per clause 2 of Part I of First Schedule, a CA in practice is allowed only to pay / share the commission or brokerage or profits from his professional business only with another practicing CA. It does not allow sharing of any fee collected from joint training sessions. Hence both CA Love & Kush are guilty of professional misconduct.",
+            "b": "Yes, CA Love & Kush will be held guilty of professional misconduct for conducting the joint training session on GST as per part IV (other misconduct) of the First Schedule of the Chartered Accountants Act 1949.",
+            "c": "Yes, this is a case of solicitation of client whereby, CA Love can influence clients of CA Kush and vice-versa. Hence the conduct of the joint training session will lead to being guilty of professional misconduct as per clause 6 of Part I of First Schedule of the Chartered Accountants Act 1949.",
+            "d": "No, as per the recent decisions of Ethical Standards Board, it is permissible for two or more CAs in practice collectively to have joint training sessions for their clients on GST, and share the fee collected from the clients thereof."
+        },
+        answer: "d",
+        reason: "As per the recent decisions of the Ethical Standards Board, it is permissible for two or more Chartered Accountants in practice to have a joint training sessions collectively for their clients on GST, and share the fees collected from the clients thereof."
+    },
+    {
+case: "M/s ANS & Associates have been appointed as statutory auditors of Delco Ltd., listed company (referred to as 'Company') for the Financial Year 2023-24. Delco Ltd. deals in the manufacture of shoes. During the audit, the auditor found that the company has acquired two subsidiaries namely Sole Ltd. dealing in the manufacture of shoe soles and Soccer Ltd. dealing in the manufacture of kid shoes. Delco Ltd. has prepared the consolidated financial statements under Indian Accounting Standards and consolidated the financial statements of subsidiary Sole Ltd. during the current financial year. However, the company has not consolidated the financial statements of Soccer Ltd., which was also acquired during the current financial year as the company has not yet been able to ascertain the fair values of certain material assets and liabilities of Soccer Ltd. as on the acquisition date. This acquisition is accounted for as an investment in the books of Delco Ltd. Had the company consolidated the financial statements of both the subsidiaries, there would have been material impact on important elements of the financial statements.",
+topic: "Audit Report",
+question: "With respect to the non-consolidation of the financial statements of Soccer Ltd. with the financial statements of Delco Ltd., how should the auditor deal with the same in their audit report?",
+options: {
+            "a": "The auditor should give a disclaimer of opinion.",
+            "b": "The auditor should give an adverse opinion if the impact is material and pervasive in his audit report.",
+            "c": "The auditor should mention this fact in the emphasis of matter paragraph pervasive in his audit report.",
+            "d": "The auditor should mention this fact in other matter paragraph pervasive in his audit report."
+        },
+        answer: "b",
+        reason: "As per SA 705, the auditor shall express an adverse opinion when the auditor, having obtained sufficient and appropriate evidence, concludes that misstatements, individually or in aggregate, are both material and pervasive to the financial statements."
+    },
+    {
+case: "The Kranti Bank Ltd. was having 150 branches all over India by the year ending 31st March, 2024. 10 branches of the bank were already covered for concurrent audit and the Bank's Audit Committee decided to include the below mentioned branches for concurrent audit from the year 2023-24. (i) Moradabad branch which started foreign exchange business from December 2023. (ii) Ludhiana branch whose aggregate deposits were more than 45% of the aggregate deposits of the bank. (iii) Mumbai branch which deals in treasury functions like investments and inter bank borrowings but not in bill re-discounting. Mishty and Associates, Chartered Accountants were appointed as the stock auditors by the Bank's audit committee for ten branches for year 2023-24. The Bank's management appointed and fixed the remuneration of Mishty and Associates, Chartered Accountants as the statutory auditors also for the year 2023-24, for the same ten branches for which they were given the assignment of stock audit.",
+topic: "Bank Audit",
+question: "Mishty and Associates, Chartered Accountants were already appointed for stock audit by the audit committee for the ten branches, so whether Mishty and Associates, Chartered Accountants are authorised to accept the appointment as statutory auditors for the same branches? Select the correct option from the following:",
+options: {
+            "a": "Mishty and Associates, Chartered Accountants can accept the appointment as they were already appointed for the stock audit of those branches by the audit committee.",
+            "b": "Mishty and Associates, Chartered Accountants can accept the appointment as they have been appointed statutory auditors for the same ten branches for which they were conducting stock audit.",
+            "c": "Mishty and Associates, Chartered Accountants cannot accept the appointment as the audit firms should not undertake statutory audit assignment while they are associated with internal assignments in the Bank during the same year.",
+            "d": "Mishty and Associates, Chartered Accountants cannot accept the appointment as it was not offered by the audit committee and Bank's management is not authorised to appoint the auditors."
+        },
+        answer: "c",
+        reason: "Internal Assignments in banks by statutory auditors: The RBI decided that the audit firms should not undertake statutory audit assignments simultaneously when they are associated with internal assignments in the bank during the same year."
+    },
+    {
+case: "ComTeK Limited, a top 1000 listed entity on the BSE by market capitalization for the past two years, sells IT and related equipment directly to consumers through its website. One day, the CFO of the company received a video call from the Managing Director (MD) instructing him to transfer 90 lakhs to the bank account of NxT Limited. When questioned by the CFO, the Managing Director explained NxT's products are fast moving and contribute 30% of the company's revenue. Further, the amount of payment is within the approved limit and can easily be remitted without any further approval. Satisfied with the explanations, the CFO made the necessary transfer. At the end of the month, while preparing the bank reconciliation statement, the CFO realised that five incremental payments of 90 lakhs each had been made to NxT Limited. These payments were unreconciled and do not have any corresponding entry in the books of account. The CFO explained the situation to the MD, reminding him about the video call that had instructed him to make such payments. However, the MD denied making any such video call. The CFO and Managing Director engaged a forensic expert, who observed that the company had cyber-attack using sophisticated Al tools.",
+topic: "Cyber Security",
+question: "In the given case, cyber-attack encountered by the company is known as:",
+options: {
+            "a": "Spoofing",
+            "b": "Denial of Services Attack",
+            "c": "Malware",
+            "d": "Identity Based Attack"
+        },
+        answer: "a",
+        reason: "Spoofing is when someone or something pretends to be something else in an attempt to gain confidence, get access to systems, steal data, steal money, or spread malware. Spoofing attacks come in many forms, including facial spoofing."
+    },
+    {
+case: "M/s JKL & Associates, Chartered Accountants, were acting as the statutory auditors of M/s IBS Bank Limited. During the statutory audit for the relevant financial year, the following observations were made: Interest income included the following: - 5 lakh relating to a short-term crop loan where instalment was overdue for one crop season. 7 lakh relating to an advance (guaranteed equally by Government of India & Government of Tamil Nadu) where the instalment was due for more than six months. A 25 month old NPA account worth 43 lakh (net book value) was sold to an asset reconstruction company for 45 lakh. The profit from the above transaction was taken to the P&L account. The above NPA was sold 'without recourse' and at cash basis. The auditors noticed a discrepancy in this transaction and hence decided to report the same.",
+topic: "Bank Audit",
+question: "From the above facts and details, what is the correct amount of interest which the bank should account in its financial statements?",
+options: {
+            "a": "Nil.",
+            "b": "8.5 lakh.",
+            "c": "5 lakh.",
+            "d": "3.5 lakh."
+        },
+        answer: "c",
+        reason: "As per the RBI circular on income recognition, in case of an NPA account, the interest shall not be accounted unless it is received. In case of short-term crop loan, the account shall be classified as NPA if the instalment is due for two crop seasons. In the given case, the instalment is due for only one crop season, hence the account is not NPA. Therefore, the interest of 5 lakhs can be accounted. The loan guaranteed by the Central and State Government is NPA since the instalment has remained overdue for more than 6 months. Therefore, the interest of 7 lakhs shall not be accounted. The fact that 50% of the loan is guaranteed by Government of India does not matter for the purpose of income recognition. It shall apply only for NPA classification."
+    },
+    {
+case: "Opus Chemicals Ltd., a prominent player in India's industrial landscape, has been etching its mark since its inception in 2008, headquartered in the bustling city of Vadodara, Gujarat. Listed on the Bombay Stock Exchange (BSE) and the National Stock Exchange of India (NSE), the company has steadily grown into a multi-faceted entity, catering to diverse industrial needs. NLP & Co., a Chartered Accountants firm, was appointed to conduct the statutory audit for F.Y. 2023-24 for the company. Mr. Kamal was the engagement partner for the said assignment. In the organisational structure, Mr. Kamal noticed that those charged with governance in the company are also involved in managing the entity. During the ongoing engagement of the audit, at the end of the third quarter, two limited review reports were issued by NLP & Co. Before the issuance of the third quarter's limited review report, the management of the company imposed a limitation on the scope of the audit that Mr. Kamal considered likely to result in the need to express a qualified opinion or to disclaim an opinion on the financial statements, and accordingly, he requested that management remove such limitations. However, the management refused to remove the said limitation. After following the due procedures applicable in the circumstances, finally, Mr. Kamal with his engagement team, concluded that the possible effects on the financial statements of undetected misstatements, could be material and pervasive so that a qualified opinion would be inadequate to communicate the gravity of the situation. Accordingly, he proposed to withdraw from the engagement after consulting with the senior partners of the firm as on 15th November, 2023. In its resignation letter, the firm mentioned professional pre-occupation as the reason for the resignation.",
+topic: "Audit Report",
+question: "What was the responsibility of NLP & Co. with respect to the issue of limited review report at the time of resignation?",
+options: {
+            "a": "Limited review report for third quarter was required to be issued.",
+            "b": "Limited review report for third quarter was required to be issued and consequently, after its issue, audit report for the full year is also required to be issued.",
+            "c": "No further Limited review report was required to be issued as it was already issued for the second quarter at the time of resignation.",
+            "d": "Limited review report for third quarter was required to be issued subject to the terms of the audit engagement."
+        },
+        answer: "b",
+        reason: "Where Auditors' withdrawal is not permitted: As per Securities and Exchange Board of India's directive on the resignation of auditor, if the auditor proposes to resign: after 45 days from the end any of the quarters of a period covered under the appointment, then he shall, before such resignation, issue the audit / Limited review report for such quarter as well as the next quarter. If the Limited Review Report has been issued for all the three quarters, then the auditor shall issue the audit report for the full year before resigning from the engagement."
+    },
+    {
+case: "JMP Limited is a public company listed on the BSE, having its registered office in Mumbai. The company is primarily engaged in the manufacturing of consumer electronics. During the preceding financial year, the company recorded a remarkable turnover of 4200 crores, accompanied by a net profit of 670 crores. Additionally, the company has secured a loan facility from the ICICI Bank amounting to 850 crores. RST & Co., a firm of chartered accountants based in Mumbai, has been appointed as a joint auditor along with LM & Co. and ABC & Co., an esteemed chartered accountant's firm in the same city. JMP Limited has completed the appointment related formalities as well as they have also signed engagement letters. The engagement letter contains details on the objective and scope of the audit, responsibilities of the auditors, management, and identification of the framework applicable. Moreover, while planning the audit, joint auditors have divided the responsibility for conducting audit in accordance with SA 299. Further, the audit team has established 42 Crore as the materiality threshold, calculated at 1% of turnover. During the audit, LM & Co. came to know that one of the employees of the company had been involved in fraud amounting to 175 Lakhs.",
+topic: "Joint Audit",
+question: "Whether RST & Co. should adhere to the opinion formulated by LM & Co. and ABC & Co. or explore alternative options.",
+options: {
+            "a": "RST & Co. will have to go with the opinion framed by the majority of auditors.",
+            "b": "RST & Co. has the discretion to issue a distinct audit report independently. In such a scenario, the reference to the other audit report issued by the majority of auditors should be noted within the 'Other Matter Paragraph'.",
+            "c": "RST & Co. has the option to incorporate a distinct audit opinion paragraph within the Common audit report, accentuating its importance through the emphasis of the matter paragraph.",
+            "d": "RST & Co. can align with the opinion formed by the majority of auditors. However, any dissenting viewpoint held by RST & Co. should be prominently highlighted within the emphasis of the matter paragraph."
+        },
+        answer: "b",
+        reason: "As per SA 299, the joint auditors are required to issue common audit report. However, where the joint auditors are in disagreement with regard to the opinion or any matters to be covered by the audit report, they shall express their opinion in a separate audit report. Such reference shall be made under the heading \"Other Matter Paragraph\" as per SA 706."
+    },
+    {
+case: "Shield & Co; a reputed Chartered Accountants firm is appointed as a statutory auditor of Prism Limited. The Company is into manufacturing of Steel products. The company has advanced in all its endeavours by supplying million Steel units. The company has incorporated another company 'SteelX Private Limited' by investing 45% in the share capital of the company and at the same time having 100% control over the Board of Directors as per the agreement with the majority shareholder. The company is listed in the US Stock Exchange but in the process of listing in the Indian Stock Exchanges, having a net worth of 280 crore. Viraj promotes the product as its product brand ambassador.",
+topic: "Audit Documentation",
+question: "The company has requested its previous auditor to give back its audit documentation ('working papers') and warned the previous auditor with legal notice to submit them back to the company showing the confidentiality clause:",
+options: {
+            "a": "The previous auditor is bound to return the workpapers as the company has raised the confidentiality clause over the audit firm. Thus, SA 230 is not applicable in such a scenario as the original owner itself requests you to return the working papers.",
+            "b": "The auditor has a right over its working papers but the owner of them is the company. He should make available the workpapers to the company at its request and SQC 1 mandates the auditor to make copies made available to its clients.",
+            "c": "The auditor has a right over its working paper, and he is the owner of the workpapers, and he may give at his discretion make available the workpapers to the company.",
+            "d": "The auditor has a right over its working paper, and he is the owner of the workpapers, but he cannot give the workpapers to any person even at the request of the company."
+        },
+        answer: "c",
+        reason: "As per Clause (1) of Part I of the Second Schedule of the Chartered Accountants Act, 1949, a Chartered Accountant in practice is deemed to be guilty of professional misconduct if he discloses information acquired in the course of his professional engagement to any person other than his client, without the consent of the client or otherwise than as required by law for the time being in force. Further, as far as working papers are concerned, working papers are the property of the auditor. The auditor may, at his discretion, make portions of or extracts from his working papers available to his client."
+    },
+    {
+case: "JDDS Deposit Limited, a NBFC registered with RBI under section 45-IA of the RBI Act and listed on National Stock Exchange, appointed BDP & Co. Chartered Accountants as their statutory auditor for the financial year ending on 31st March 2024. Mr. Rajan the audit partner of BDP & Co. extracted the monthly net owned fund position from the books of JDDS Deposit Limited. During the year, Mr. Rajan recommended to the Board and Audit Committee the appointment of internal auditors. However, the Board rejected this recommendation due to budget constraints. They assured that they would consider establishing an internal audit department within the Company next year.",
+topic: "NBFC Audit",
+question: "Kindly guide Mr. Rajan regarding areas where he may need to report the absence of internal audit function in the company in Audit Report.",
+options: {
+            "a": "The auditor is required to report the same under Para 3(xiii) of the CARO (Companies Auditor's Report Order), 2020.",
+            "b": "The auditor is required to report the matter in the Basis of Qualification paragraph of his audit report as the auditor was unable to place a reliance on the internal audit function of the Company.",
+            "c": "The auditor is required to report the same under Para 3(xiv) of the CARO (Companies Auditor's Report Order), 2020.",
+            "d": "The auditor is required to report the said matter in Key Audit Matters as per SA 701, which requires significant professional judgement and user attention."
+        },
+        answer: "c",
+        reason: "As paragraph 3 (xiv) of CARO,2020 (a) whether the company has an internal audit system commensurate with the size and nature of its business; (b) whether the reports of the Internal Auditors for the period under audit were considered by the statutory auditor."
+    },
+    {
+case: "MSK & Partners, a firm of Chartered Accountants, having CA Manik and CA Taran as partners, is based at Bangalore. MSK & Partners are appointed to conduct statutory audit of Zylo Ltd. Zylo Ltd. is required to appoint an internal auditor as per statutory provisions given in the Companies Act, 2013 and appointed CA. IA as its internal auditor. MSK & Partners asked Mr. IA to provide direct assistance to him regarding evaluating significant accounting estimates by the management and assessing the risk of material misstatements. He also seeks his direct assistance in assembling the information necessary to resolve exceptions in confirmation responses with respect to external confirmation requests and evaluation of the results of external confirmation procedures.",
+topic: "Using the Work of Internal Auditors",
+question: "MSK & Partners sought direct assistance from CA. IA, internal auditor as stated in the above scenario. Advise as to whether he is permitted to do so in accordance with relevant Standards on Auditing.",
+options: {
+            "a": "MSK & Partners can ask CA. IA for direct assistance regarding evaluating significant accounting estimates and assessing the risk of material misstatements and in assembling the information necessary to resolve exceptions in confirmation responses as per SA 610.",
+            "b": "CA. IA cannot assist MSK & Partners in assembling information necessary to resolve exceptions in confirmation responses. However, MSK & Partners can ask Mr. IA for direct assistance regarding evaluating significant accounting estimates and assessing the risk of material misstatements as per SA 610.",
+            "c": "MSK & Partners cannot ask CA. IA for direct assistance regarding evaluating significant accounting estimates and assessing the risk of material misstatements and in assembling the information necessary to resolve exceptions in confirmation responses as per SA 610.",
+            "d": "MSK & Partners cannot ask CA. IA for direct assistance regarding evaluating significant accounting estimates and assessing the risk of material misstatements. However, CA. IA may assist MSK & Partners in assembling information necessary to resolve exceptions in confirmation responses as per SA 610."
+        },
+        answer: "d",
+        reason: "As per SA 610, the external auditor shall not use internal auditors to provide direct assistance to perform procedures that: (i) Involve making significant judgments in the audit; (ii) Relate to higher assessed risks of material misstatement where the judgment required in performing the relevant audit procedures or evaluating the audit evidence gathered is more than limited; However, internal auditors may assist in assembling information necessary for the external auditor to resolve exceptions in confirmation responses."
+    },
+    {
+case: "Govil is a practicing-chartered accountant and also member of CPA Ireland. He handles only GST related work and tax audits for clients. Currently, he has 19 companies for which he is handling the tax audit. At the beginning of the current Financial Year, he was approached by 40 new clients for tax audit assignments. He was reluctant to accept all the work as he feared breaching the permissible limit of handling clients. After consulting several friends of his, he finally decided to accept the work of just 2 big clients who approached him.",
+topic: "Professional Ethics",
+question: "In the given case scenario, has Govil breached the maximum limit of clients. If yes, can he be held guilty of professional misconduct?",
+options: {
+            "a": "Yes. The ceiling on number of tax audits which can be accepted by a chartered accountant is 20. In this given case, Govil is already having 19 clients and has now accepted 2 more (19+2=21) Also, he shall be held guilty of professional misconduct as per the Chartered Accountants Act, 1949.",
+            "b": "Yes. The ceiling on number of tax audits which can be accepted by a chartered accountant is 20. In this given case, Govil is already having 19 clients and has now accepted 2 more (19+2=21). However, this shall not be considered as guilty of professional misconduct as per the Chartered Accountants Act, 1949.",
+            "c": "No. In the above case, the maximum ceiling is 25 in number (as per the latest decision taken by the ICAI council). The assignments (existing + new) handled by Govil is well below the prescribed limit and hence there is no breach.",
+            "d": "No. In the above case, the maximum ceiling is 60 in number. The assignments (existing + new) handled by Govil is well below the prescribed limit and hence there is no breach."
+        },
+        answer: "d",
+        reason: "As per Council General Guidelines 2008, a member of the Institute in practice shall not accept, in a financial year, more than the 'specified number of tax audit assignments' under Section 44AB of the Income-tax Act, 1961. In the case of firm of Chartered Accountants in practice 'the specified number of tax audit assignments' means 60 tax audit assignments per partner in the firm, in a financial year, whether in respect of corporate or non-corporate assessees."
+    },
+    {
+case: "Honey and Money Associates is a firm of Chartered Accountants that provides assurance services to many companies, including listed companies. The firm has offices across many locations in India, with subject matter experts in most of these locations. The firm has established a comprehensive quality management system covering leadership responsibilities for quality within the firm, ethical requirements, acceptance, and continuance of client relationships and specific engagements based on SQC 1 issued by the ICAI. During the current year, the audit engagement of a listed company was picked up for an inspection by an appropriate authority. The inspection covered various aspects of the audit of financial statements and included an assessment of the firm's quality control system.",
+topic: "Quality Control",
+question: "Whether the selection of EQCR is as per the requirements of SQC 1?",
+options: {
+            "a": "No. EQCR's objectivity was not maintained since it was selected by the engagement partner, and no formal communication was made regarding such selection.",
+            "b": "Yes. CA Money is a perfect match for the engagement team, as his experience as a tax professional is directly relevant to the company's tax litigations.",
+            "c": "No. The EQCR's objectivity could not be maintained since it was selected by the engagement partner and made decisions for the engagement team.",
+            "d": "Yes. CA Money is a perfect match for the engagement team, as his experience as a tax professional is directly relevant to tax litigation. The EQC review was conducted in a timely manner before the issuance of the audit report."
+        },
+        answer: "c",
+        reason: "As per SQC 1, the firm's policies and procedures are designed to maintain the objectivity of the engagement quality control reviewer. For example, the engagement quality control reviewer: (i) Is not selected by the engagement partner; (ii) Does not otherwise participate in the engagement during the period of review; (iii) Does not make decisions for the engagement team; and (iv) Is not subject to other considerations that would threaten the reviewer's objectivity."
+    },
+    {
+case: "M/s HVM & Co. is a firm of Chartered Accountants based in Chennai. CA M, CA V and CA H are the partners of the firm. The firm is engaged in various assignments including audits and its engagement partners who were handling their respective assignments for the financial year 2023-24 dealt with the following issues raised during and after the course of their respective audits. M/s HVM & Co. are appointed as statutory auditors of AST Ltd. for the financial year 2023-24. CA V, the engagement partner while conducting an audit of AST Ltd. was encountered with significant difficulties. He observed that there are not only inordinate delays by the management but lack of willingness by the authorised personnel of the company in providing the required information necessary to perform audit procedures in making the assessment of AST Ltd.'s ability to continue as a going concern in view of material uncertainty related to it. CA V wants to communicate this and other circumstances as additional information in his report with those charged with the governance.",
+topic: "Written Representations",
+question: "Since there arose a doubt on the management representation and considering the responsibilities of M/s HVM & Co. to obtain written representations from management as per relevant Standard on Auditing, select the incorrect option from the following:",
+options: {
+            "a": "Although written representations provide necessary audit evidence, they do not provide sufficient appropriate audit evidence on their own about any of the matters with which they deal.",
+            "b": "The fact that management has provided reliable written representations affect the nature or extent of other audit evidence that the auditor obtains about the fulfilment of management's responsibilities, or about specific assertions.",
+            "c": "In the case of identified inconsistencies between one or more written representations and audit evidence obtained from another source, the auditor may consider whether the risk assessment remains appropriate and, if not, revise the risk assessment and determine the nature, timing and extent of further audit procedures to respond to the assessed risks.",
+            "d": "The auditor may have identified significant issues relating to the competence, integrity, ethical values or diligence of management, or about its commitment to or enforcement of these, but concluded that the written representations are nevertheless reliable. In such a case, this significant matter is documented in accordance with SA 230."
+        },
+        answer: "b",
+        reason: "As per SA 580, the fact that management has provided reliable written representations does not affect the nature or extent of other audit evidence that the auditor obtains about the fulfilment of management's responsibilities or about specific assertions."
+    },
+    {
+case: "M/s Roshan & Associates (referred to as 'auditor') have been appointed as one of the statutory central auditors of GHF Bank (referred to as 'Bank') for the Financial Year 2023-24. During the audit, it was found that the bank has a balance with a Swiss based bank. The auditor understands that such balance is a matter of important consideration in the audit of the bank. The engagement partner, Mr. Mitansh, has also advised the audit staff to check in detail the following items appearing in the financial statements of the bank during the year under audit. Amount of interest accrued and not due on deposits amounting to 87,75,000/-. The balance of Interest rate swaps amounting to 81,26,500/-. Further, the statutory auditors understand that one of the most important areas to be checked in the audit of a bank is compliance with CRR and SLR requirements.",
+topic: "Bank Audit",
+question: "The balance of GHF Bank with the Swiss based Bank should be converted into Indian Currency at the following rate:",
+options: {
+            "a": "The exchange rate prevailing on the Balance sheet date.",
+            "b": "The average of opening and closing exchange rates during the year.",
+            "c": "The exchange rate as prescribed by Reserve Bank of India.",
+            "d": "The exchange rates applicable on the respective dates of transaction in the account."
+        },
+        answer: "a",
+        reason: "These balances should be converted into the Indian currency at the exchange rates prevailing on the balance sheet date."
+    },
+    {
+case: "BNN Ltd., incorporated in the financial year 1980-81, is a distinguished company specialising in the manufacturing of nickel-based batteries. As one of the oldest manufacturing companies in this sector, BNN Ltd. operates with two manufacturing plants and a comprehensive distribution network that spans across India. Remarkably, BNN Ltd. was among the first companies to be listed on the stock exchange, underscoring its longstanding presence in the market. The company has consistently adhered to the Securities and Exchange Board of India (Listing Obligations and Disclosure Requirements) Regulations 2015, ensuring compliance with all regulatory standards. M/s KP & Co. were the statutory auditors in the previous year and resigned from the role of statutory auditor. M/s JKL & Co. is appointed as a statutory auditor of BNN Ltd. in FY 2023-24. In conducting initial audit engagement, M/s JKL & Co. has simply placed reliance on the closing balances of the preceding period.",
+topic: "Going Concern",
+question: "As per the requirement of SA 570, how auditors should deal with the matter of unwillingness of management to provide for the assessment relating to going concern?",
+options: {
+            "a": "Auditor should report such matters in the section of Key Audit Matter.",
+            "b": "The auditor should properly document evidence relating to asking management and its subsequent follow up with the management for assessment on going concern and accordingly should express unmodified opinion.",
+            "c": "Auditor should report such matters in Emphasis of Matter Paragraph Section.",
+            "d": "Auditor should express modified opinion in his audit report."
+        },
+        answer: "d",
+        reason: "As per SA 570, if management is unwilling to do so, a qualified opinion or a disclaimer of opinion in the auditor's report may be appropriate, because it may not be possible for the auditor to obtain sufficient appropriate audit evidence regarding management's use of the going concern basis of accounting in the preparation of the financial statements, such as audit evidence regarding the existence of plans management has put in place or the existence of other mitigating factors."
+    },
+    {
+case: "EFG Ltd., incorporated in 1984-85, has distinguished itself as one of the most rapidly growing non-banking financial companies (NBFCs) having principal business of granting loans. Its head office is situated in Pune, a city renowned for its dynamic financial and industrial sectors. Remarkably, EFG Ltd. holds the notable achievement of being among the first NBFCs to be listed on the stock exchange, which underscores its longstanding and influential presence in the financial market. Over the years, the company has demonstrated an unwavering commitment to regulatory compliance by consistently adhering to the Securities and Exchange Board of India's (SEBI) Listing Obligations and Disclosure Requirements Regulations of 2015. This steadfast adherence ensures that all its operations align with the rigorous standards set by regulatory authorities, thereby reinforcing its credibility and trustworthiness among investors and stakeholders. M/s SDS & Co. thoroughly obtained the knowledge and background of the company, including an understanding of the legal and regulatory requirements applicable to the company.",
+topic: "CARO, 2020",
+question: "Considering the nature of the business, which Reporting clauses of CARO, 2020 would be applicable from below: - (i) Whether the company has conducted any Non-Banking Financial or Housing Finance activities without a valid Certificate of Registration (CoR) from the Reserve Bank of India as per the Reserve Bank of India Act, 1934 (ii) In respect of loans and advances in the nature of loans, whether the schedule of repayment of principal and payment of interest has been stipulated and whether the repayments or receipts are regular; (iii) Whether the company is required to be registered under section 45-IA of the Reserve Bank of India Act, 1934 and if so, whether the registration has been obtained. (iv) Whether the company has provided any loans, guarantee or provided security to any other entity.",
+options: {
+            "a": "Only (i) and (iii)",
+            "b": "Only (i), (ii) and (iii)",
+            "c": "Only (i) and (ii)",
+            "d": "Only (i), (ii) and (iv)"
+        },
+        answer: "b",
+        reason: "As per Clause (iii) (a) of Para 3 of CARO, 2020 auditor is required to report whether during the year the company has provided loans or provided advances in the nature of loans, or stood guarantee, or provided security to any other entity [not applicable to companies whose principal business is to give loans]. Thus, Considering the nature of business auditor is not required to report the same."
+    },
+    {
+case: "Bhuvan & Co. Chartered Accountants, mainly into statutory audit and tax audit, are now exploring the areas of due diligence and investigation assignments. In this regard, the following events may be noted: (a) One of the clients of Bhuvan & Co. is planning to acquire another company to expand its business. In this regard, due diligence is to be carried out to check if the proposed merger would create operational synergies. Also, a full-fledged financial due diligence is planned to be carried out after a price has been agreed for the business acquisition. They want to include, Cash flow, Accounting Policies, Brief history of the target and background of its promoters, Accounting Information System etc. in the scope of the same. (b) During the course of due diligence, an articled assistant enquires to the principal whether it is required to verify the letter of comfort given by the target company to a bank.",
+topic: "Due Diligence",
+question: "Whether letter of comfort given to banks by the target company needs to be reviewed as part of the financial due diligence. Choose the correct reasoning from below?",
+options: {
+            "a": "Yes, the objective of due diligence exercise will be to look specifically for any hidden liabilities or over-valued assets and since, letter of comfort given to banks is a hidden liability, it should be reviewed.",
+            "b": "Yes, letter of comfort given to banks is a guarantee and will be disclosed in the notes to accounts of the financial statements and calls for verification and review.",
+            "c": "No, due diligence involves the review of only disclosed assets and liabilities of the target company and hence, letter of comfort does not call for review.",
+            "d": "No, letter of comfort does not involve financial implications and hence it need not be reviewed as part of financial due diligence."
+        },
+        answer: "a",
+        reason: "The objective of due diligence exercise will be to look specifically for any hidden liabilities or over-valued assets and accordingly hidden liabilities include letter of comforts. Since these are not guarantees; these may not be disclosed in the Balance Sheet of the target company."
+    },
+    {
+case: "CA Kunal is in the midst of conducting statutory audit for the year 2023-24 of 'TSG Chemicals Limited', a listed company. He is collecting information required for reporting under CARO, 2020 from the management. Audit procedures, as are necessary in the circumstances will be performed on the information obtained. The company's revenue from sales of products is 15,000 crore. During this exercise, he obtained the following information: A. The management has provided the following details of dues that have not been deposited on 31st March, 2024 on account of disputes: [Table of disputed dues]. B. The company has already made a provision of ₹10 crore in its financial statements considering the likely outcome of ongoing matters under dispute at ITAT. However, no provision has been made in respect of income-tax matters pending before CIT(Appeals), PF contribution matter and property tax matter pending before Hon'ble High Court.",
+topic: "CARO, 2020",
+question: "Identify the correct statement relating to the reporting duties of the auditor under clause 3(i) of CARO, 2020 with regard to:",
+options: {
+            "a": "It is the duty of the auditor to report whether company is maintaining proper records showing full particulars, including quantitative details and situation of Property, Plant and Equipment. This duty also applies to reporting on maintenance of records for Right-of-use assets and intangible assets. Further, auditor has to report on whether Property, Plant and Equipment have been physically verified by management at reasonable intervals. This duty to report on physical verification by management also extends to Right-of-use assets.",
+            "b": "It is the duty of the auditor to report whether company is maintaining proper records showing full particulars, including quantitative details and situation of Property, Plant and Equipment. This duty does not extend to reporting on maintenance of records for Right-of-use assets and intangible assets. Further, auditor has to report on whether Property, Plant and Equipment have been physically verified by management at reasonable intervals. This duty to report on physical verification by management does not extend to Right-of-use assets.",
+            "c": "It is the duty of the auditor to report whether company is maintaining proper records showing full particulars, including quantitative details and situation of Property, Plant and Equipment. This duty also applies to reporting on maintenance of records for Right-of-use assets and intangible assets. Further, auditor has to report on whether Property, Plant and Equipment have been physically verified by management at reasonable intervals. However, this duty to report on physical verification by management does not extend to Right-of-use assets.",
+            "d": "It is the duty of the auditor to report whether company is maintaining proper records showing full particulars, including quantitative details and situation of Property, Plant and Equipment. Similarly, there is a duty to report on whether company is maintaining proper records showing full particulars of intangible assets. However, this duty does not extend to reporting on maintenance of records for Right-of-use assets. Further, auditor has to report on whether Property, Plant and Equipment have been physically verified by management at reasonable intervals. This duty to report on physical verification by management does not extend to Right-of-use assets."
+        },
+        answer: "a",
+        reason: "Under Clause 3(i)(a) of CARO, 2020, the auditor is required to report on maintenance of proper records showing full particulars including quantitative details and situation of Property, Plant and Equipment. It includes reporting on maintenance of records for Right of use assets. This clause also casts duty upon audit report on maintenance of records for intangible assets. Further, auditor is also required to report on whether Property, Plant and Equipment have been physically verified by management at reasonable intervals. This duty to report on physical verification by management also extends to Right-of-use assets."
+    },
+    {
+case: "CA Kumar is statutory auditor of a listed company engaged in providing services relating to “hospitality sector”. He is practicing in sole proprietorship capacity. The audit of above said listed company was conducted by his proprietary firm and the report was issued for year 2023-24. Subsequently, the audit report was selected by NFRA to oversee quality of service and compliance with Standards. Necessary information was called from the auditor towards the above objective. It was required of him to produce audit working papers to show that audit was carried out in accordance with Standards on Auditing. Details of the audit plan and details of risk assessment procedures carried out to identify and assess risk of material misstatement in financial statements were called. It was also required to show how response to assessed risks was designed and implemented and communicated with those charged with governance. Audit working papers sent by him through email included procedures on how some balances in the financial statements were verified. Also included in working papers were procedures performed by him relating to verification of inventories, trade receivables and trade payables. The working papers sent by him to the authority did not include details on audit plan and manner of identifying and assessing risks of material misstatement. On being asked to respond, it was reasoned by him that audit was properly planned and required procedures were carried out in relation to material items on test check basis. It has been further clarified by him to the authority that audit was carried out in accordance with Standards, and it was practically not feasible for a firm of small size to make a detailed audit plan. It was also put on record with authority that he had assessed risk of material misstatement to be low based upon his understanding of the company. He has further reasoned that assessing risks is a matter of professional judgment. Representation has also been made by him stating that communications as necessary were made orally with those charged with governance.",
+topic: "Quality Control",
+question: "It has been contended by the auditor that the audit was properly planned. He has further stated that it was practically not feasible for firms of small size to prepare a detailed audit plan. Which of the following views is most appropriate in this regard?",
+options: {
+            "a": "Audit was, in fact, planned as evidenced by auditor’s submissions. However, there is an exemption for small CA firms doing away with cumbersome documentation in relation to audit plan.",
+            "b": "Since auditor has no record of audit plan, it indicates non compliance with SA 220.",
+            "c": "Audit was, in fact, planned as evidenced by auditor’s submissions.",
+            "d": "Although auditor has no record of audit plan, it does not affect compliance with SA 220."
+        },
+        answer: "b",
+        reason: "In accordance with SA 220, one of the objectives of the auditor is to implement quality control procedures at the engagement level that provide the auditor with reasonable assurance that the audit complies with professional standards and regulatory and legal requirements. Failure to document the audit plan shows non-compliance with professional standards and consequently SA 220."
+    },
+    {
+case: "CA. Munish is conducting audit of Mixer Limited. He is auditor of the company since last three years and has found nothing unusual in operations and financial statements of the company. The company has many locations where substantial inventories are stored and lying. During his fourth year stint, he finds that inventory quantities have risen disproportionately as compared to past few years trends. He has assessed existence of risk of material misstatement due to fraud. The company has revenue of ` 580 crore during the year. He has deeply verified all aspects pertaining to revenue recognition of the company and has concluded that there is no risk of material misstatement due to fraud related to revenue recognition.",
+topic: "Fraud Risk",
+question: "With respect to auditor’s conclusion relating to risk of material misstatement due to fraud related to revenue recognition, which of the following statements is most appropriate in this respect?",
+options: {
+            "a": "The auditor needs to document reasons for arriving at conclusion that there is no risk of material misstatement due to fraud related to revenue recognition.",
+            "b": "Identified and assessed risks of material misstatement due to fraud need to be documented. Since no risk of material misstatement due to fraud pertaining to revenue recognition was identified, separate documentation in this respect is not needed.",
+            "c": "The auditor needs only to document that no risk of material misstatement due to fraud relating to revenue recognition was identified.",
+            "d": "The auditor needs to give reference to discussion among engagement team members to document that no risk of material misstatement due to fraud relating to revenue recognition was identified."
+        },
+        answer: "a",
+        reason: "In accordance with SA 240, when the auditor has concluded that the presumption that there is a risk of material misstatement due to fraud related to revenue recognition is not applicable in the circumstances of the engagement, the auditor shall document the reasons for that conclusion."
+    },
+    {
+case: "You are the auditor of 'Rev Motors Ltd.', a listed company specialising in manufacturing components for electric vehicles. The company has experienced rapid growth in recent years due to the increasing demand for electric vehicles. However, the industry is highly competitive, with several new entrants and rapid technological advancements. Revenue for the year ended March 31, 2024, declined by 15% compared to the previous year. The company reported a net loss of INR 10 Crores for the year ended March 31, 2024. The company's current liabilities exceeded its current assets by INR 25 Crores as at March 31, 2024. The company's debt-to-equity ratio increased from 1.2 to 1.8 during the year ended March 31, 2024. Management has acknowledged the challenges that are present in the market conditions but has expressed confidence in the company's ability to secure new contracts and to bring the company's profitability back in the next financial year. Management had prepared a cash flow forecast for the next 12 months, which provided that the company will need additional financing of INR 30 Crore to meet its obligations. Management is actively looking for various financing options available in the market, including a potential equity rights issue and with banks for additional cash credit up to INR 40 Crore, which is already approved by the board. However, management is pursuing further actions and steps.",
+topic: "Risk Assessment",
+question: "In assessing whether the risk of material misstatement related to Rev Motors Ltd.'s revenue recognition policy is a significant risk, which of the following is most critical for the statutory auditor to consider as per SA 315, even when the internal audit team has found no fraud risk based on management's experience?",
+options: {
+            "a": "The internal audit team's competence and objectivity in evaluating management's experience.",
+            "b": "Management's integrity and whether their experience translates into appropriate accounting estimates.",
+            "c": "The complexity of the transactions and the degree of subjectivity in measuring the percentage of completion.",
+            "d": "Whether the revenue recognition policy is appropriate for the company's business and consistent with the applicable financial reporting framework."
+        },
+        answer: "c",
+        reason: "SA 315 requires the auditor to exercise professional judgment and skepticism, even when relying on the work of the internal audit team. While management's experience is relevant, it's not the sole determinant of risk. The complexity of transactions and subjectivity in measurement are critical elements under SA 315 that contribute to a high risk of material misstatement, irrespective of management's experience."
+    },
+    {
+case: "CA. Sarthak is in midst of finalising audit reports of four clients. On reviewing each file, it is noticed as under: [A] With respect to a company engaged in business of selling of agricultural products which are outside ambit of GST, the engagement team has found that substantial part of revenues of the company (about 75%) is generated through cash sales. However, there is no proper system and internal control to verify accuracy of revenues generated through cash sales. Therefore, the team has been unable to verify such revenues generated through cash sales.",
+topic: "Audit Opinion",
+question: "As regards description regarding revenues generated through cash sales of a company, which of the following statements is most appropriate in terms of SA 705?",
+options: {
+            "a": "Qualified opinion will be issued and basis for qualified opinion will also be provided.",
+            "b": "Adverse opinion will be issued and basis for adverse opinion will also be provided.",
+            "c": "A disclaimer of opinion will be issued and basis for disclaimer of opinion will also be provided. Besides, statement in audit report will be changed from “financial statements have been audited” to “auditor was engaged to audit financial statements.”",
+            "d": "A disclaimer of opinion will be issued and basis for disclaimer of opinion will also be provided. Besides, statement in audit report will be changed from “financial statements have been audited” to “financial statements have not been audited.”"
+        },
+        answer: "c",
+        reason: "Team is unable to obtain sufficient appropriate audit evidence to conclude that the financial statements as a whole are free from material misstatement. Therefore, disclaimer of opinion and basis of opinion shall be given in terms of SA 705. Further, when the auditor disclaims an opinion, the auditor shall amend the statement required by SA 700 which indicates that the financial statements have been audited, to state that the auditor was engaged to audit the financial statements."
+    },
+    {
+case: "CA Priya, a partner in M/s P & Associates, is carrying out a statutory audit of M/s Zigzag Ltd. for the Financial Year 2023-24, and she is ready to sign her audit report on 05.07.2024. There are some written representations which are pending with the management of the company pertaining to such an audit, and she sent Aakash (her articled trainee), who is also a member of the engagement team, to the company’s office for collection of the same. On returning, Aakash tells CA Priya that major stocks of the company got destroyed because of a fire in their plant on 27.06.2024, and it has affected the company’s operations badly. However, the business operations are likely to be resumed by management at an alternate place. CA Priya postponed the issuance of the audit report to consider the impact of such an event on the financial state of affairs of the company. She wants the management to disclose the impact of this unfortunate event in financial statements for the year 2023-24, to which management is disinclined. After the management’s refusal, she issued her audit report on 15.07.2024.",
+topic: "Subsequent Events",
+question: "What should be the appropriate date of signing of the new audit report?",
+options: {
+            "a": "20.07.2024.",
+            "b": "Anytime between 15.07.2024 & 18.07.2024.",
+            "c": "On or after 25.07.2024.",
+            "d": "Anytime between 15.07.2024 & 25.07.2024."
+        },
+        answer: "c",
+        reason: "In terms of SA 560, if management amends financial statements, the new auditor’s report shall not be dated earlier than the date of approval of the amended financial statements."
+    },
+    {
+case: "While auditing consolidated financial statements of Gupta Industries Limited for the year 2023-24, a manufacturing company whose financial statements are required to be prepared in accordance with Division II of Schedule III of the Companies Act, 2013, CA. Akshay Shah notices as under: - (A) The notes to accounts in respect of consolidated financial statements disclose additional information pertaining to the holding company and its subsidiaries. It provides disclosure regarding percentages of consolidated net assets, of consolidated profit and loss and of total comprehensive income along with their respective amounts pertaining to holding company and its subsidiaries.",
+topic: "Consolidated Financial Statements",
+question: "Considering disclosure of additional information in consolidated financial statements as stated in para (A) of case study, which of the following statements is correct?",
+options: {
+            "a": "The said disclosure is not proper as percentage of consolidated revenue from operations along with respective amount pertaining to holding company and its subsidiaries is also required.",
+            "b": "The said disclosure is not proper as percentage of other comprehensive income along with respective amount pertaining to holding company and its subsidiaries is also required.",
+            "c": "The said disclosure is not proper as percentages of consolidated revenue from operations as well as other comprehensive income along with their respective amounts pertaining to holding company and its subsidiaries are also required.",
+            "d": "The said disclosure is proper."
+        },
+        answer: "b",
+        reason: "When financial statements are required to be consolidated, information relating to amount in OCI and percentage of OCI as percentage of consolidated OCI is required to be disclosed pertaining to parent and its subsidiaries in accordance with Schedule III requirements."
+    },
+    {
+case: "CA. Ronit is conducting concurrent audit of a branch of a nationalized bank. It is a large branch with deposits of ` 300 crore and advances of ` 600 crore respectively. The deposits of branch consist of term deposits along with CASA deposits. It is an old branch that has been in operation since the early 80s. Therefore, there are many dormant deposit savings, current and term deposit accounts at the branch. As per CA. Ronit the following is the part of the duty of the concurrent auditor, as regards the dormant deposit accounts in the branch: (i) Following up with account holders to ensure that status of accounts remain active. (ii) Examining authorization for withdrawals. (iii) Verifying that dormant accounts are revived with appropriate authority.",
+topic: "Concurrent Audit",
+question: "The concurrent auditor wants to ensure that fresh CASA accounts opened in the branch are KYC compliant. Which of the following best sums up the scope of KYC guidelines prescribed by RBI?",
+options: {
+            "a": "Such guidelines contain detailed requirements in respect of customer acceptance policy, customer identification procedures, monitoring of transactions and risk management.",
+            "b": "The basic purpose of such guidelines is to weed out duplicate customers at the same branch.",
+            "c": "Such guidelines contain detailed requirements for banks to enable them to draw a 360-degree credit profile of the customers by monitoring of transactions. Its primary purpose is assisting banks in making prudent credit decisions.",
+            "d": "Such guidelines have a basic objective of ensuring credit of Direct benefit transfers (DBT) in accounts of deserving account holders."
+        },
+        answer: "a",
+        reason: "KYC guidelines prescribed by RBI relate to requirements in respect of customer acceptance policy, customer identification procedures, monitoring of transactions and risk management. All other options are wrong regarding the proper scope of KYC guidelines."
+    },
+    {
+case: "CA. Ananya is statutory auditor of “Vikas Finance Limited”, a micro finance institution, pre-dominantly operating in Uttarakhand, Bihar, Chhattisgarh, and Gujarat. It is a non-deposit taking NBFC catering to credit requirements of rural and semi-urban households and provides small ticket loans. She has performed audit procedures for the year 2023-24 and following further information is given as under:- (A) The Board of Directors of the company has passed a resolution in its meeting held on 25th May 2023 for non-acceptance of public deposits during year ended 31st March, 2024.",
+topic: "NBFC Audit",
+question: "The Board of Directors has passed a resolution as mentioned in para (A). Which of the following statement is most appropriate as regards reporting obligations of auditor are concerned?",
+options: {
+            "a": "Matter of passing of board resolution for non-acceptance of public deposits is a specific reporting requirement in auditor’s additional report to the Board of Directors of the company.",
+            "b": "Passing of board resolution for non-acceptance of public deposits, being an internal governance matter, is not required to be reported by auditor.",
+            "c": "Matter of passing of board resolution for non-acceptance of public deposits is a specific reporting requirement for auditor under CARO, 2020.",
+            "d": "Matter of passing of board resolution for non-acceptance of public deposits is a specific reporting requirement in auditor’s additional report to the Board of Directors of the company as well as under CARO, 2020."
+        },
+        answer: "a",
+        reason: "The company is a non-deposit taking NBFC. Matter of passing of board resolution for non-acceptance of deposits is a specific reporting requirement in auditor’s additional report to BOD under RBI directions for such type of companies."
+    },
+    {
+case: "Kochhar & Associates are refreshening up their knowledge on functions of various Parliamentary financial committees and on the varied functions and duties of Comptroller & Auditor General of India in relation to audits of government institutions and government companies. They recognize that a thorough understanding of the C&AG’s responsibilities is essential for conducting audits effectively in this sector. To enhance their knowledge, they have reviewed various resources, both online and offline, including the official C&AG website. Below is a summary of key insights drawn from their research: [A] In one of its reports, the C&AG, in respect of a state government owned industrial development corporation, pointed out non-adherence of One-time settlement (OTS) guidelines of state government by the corporation resulting in acceptance of a below par OTS proposal thus foregoing recovery of loan amounting to ` 8.52 crores. The said corporation was providing loans to industrial units.",
+topic: "Government Audit",
+question: "Considering the description stated in para [A] of the case, the above audit finding is likely to fall in which areas?",
+options: {
+            "a": "Propriety audit.",
+            "b": "Comprehensive audit.",
+            "c": "Compliance audit",
+            "d": "Performance audit."
+        },
+        answer: "c",
+        reason: "The C & AG in its report has pointed out non-adherence to OTS guidelines. Compliance audit is also concerned with regularity i.e. adherence of subject matter to formal criteria emanating from relevant rules, regulations and agreements applicable to the entity."
+    },
+    {
+case: "ABC Ltd. is in the business of trading garments. Within a span of five years since its incorporation, the company has gained a good market reputation. Last year, in its Kochi warehouse the inventory was less than 1% of total inventory value, so the auditor instead of witnessing or performing the physical count of inventory relied upon the management’s inventory confirmation and management in turn relied upon the warehouse keeper’s stock register without verifying the actual count. The same year there was some difference between the store register and books of accounts closing balance. The management considered it to be an immaterial amount and wrote it off through “Miscellaneous Profit and Loss Account”. In the current year, while performing analytical procedure, the auditor saw a significant reduction in sales through Kochi warehouse, whereas there was a spike in freight charges to Kochi. Through further examination, the auditor noticed that there was increase in number of shipments to Kochi and increase in number of invoice cancellation instances and sales return instances from the customers of GST unregistered category. However, this year the inventory lying at Kochi is 4.5% as per books.",
+topic: "Audit Risk",
+question: "Which according to you is the correct statement in context of the aforesaid case scenario?",
+options: {
+            "a": "Only the errors can be expected to be identified during the audit.",
+            "b": "Only the statutory compliance can be expected out of a Statutory Audit.",
+            "c": "The auditor contends that last year the inventory levels in Kochi were not in the sampling materiality level and therefore, the issue was not identified. This is a part of the audit risk.",
+            "d": "The management is of the view that all the frauds and errors must be identified by the statutory auditor."
+        },
+        answer: "c",
+        reason: "This is a detection risk, which is a part of Audit Risk and was unidentified because it was not considered material."
+    },
+    {
+case: "Royal Bank of India is a Public Sector Bank founded in the year 1964. The bank has 183 branches all over India as on 31.03.2024. Total deposits of the bank on 31.03.2024 was ` 50,000 crore. The Motto of the Bank is “Royalty lies in Loyalty”. The Statutory Auditors for FY 2023-24 are PK & Associates, Chartered Accountants. The audit manager of the firm while reviewing advances noticed the following: (a) The advance granted to Mr. X has been guaranteed by State Government. However, said advance is overdue since November 2023. (b) As on 20.04.2024, the ad hoc limit of account of Mr. Y has not been reviewed even though 120 days of date of ad hoc sanction were over. The above advances have been granted by Meerut Branch. However, this branch is not subject to Concurrent Audit.",
+topic: "CARO, 2020",
+question: "As statutory auditor of Samarth Ltd, identify the aggregate amount which shall be reported under clause (ix) of Para 3 of CARO, 2020 on account of utilisation of term loans for the purpose other than for which they were obtained?",
+options: {
+            "a": "` 4 crore.",
+            "b": "` 5 crore.",
+            "c": "` 7 crore.",
+            "d": "` 2 crore."
+        },
+        answer: "c",
+        reason: "As per clause (ix) (c) of Paragraph 3 of CARO,2020, the auditor is required to report whether term loans were applied for the purpose for which the loans were obtained; if not, the amount of loan so diverted and the purpose for which it is used may be reported; Amount not utilised for purpose or diverted includes: Land Purchased for New Office: ` 4 crore; Development and construction Expenses of New Office: ` 1 crore; Investment in Fixed Deposit: ` 2 crore."
+    },
+    {
+case: "Papa Limited is a listed nationalised bank whose face value per share is ` 100 each having its operation across India. Papa Limited appointed Mr. Das, Mr. Pas and Mr. Tas as its central joint auditors for the year 2023-24. After making sure that all of them are qualified to be appointed as statutory auditors of the bank, Papa Limited issued appointment letter as well as engagement letter to all of them. The engagement letter contains the details on objective and scope of audit, responsibilities of auditor, management and identification of framework applicable. It also contains the reference to expected form and content of report from all three joint auditors. During the year, Papa Limited has acquired another bank called Baby Limited. While finalising the books of accounts, some adjustments were made to give the effect of merger. These adjustments were related to determination of goodwill of ` 2 crore, determination of amount of minority interest of ` 50 lakh and some intra-group transaction adjustment of ` 15 lakh were also made. Another adjustment which was made was harmonization of accounting policies of both Papa Limited and Baby Limited which was of ` 30 lakh.",
+topic: "Consolidated Financial Statements",
+question: "Which of the following statement is true as per given situation?",
+options: {
+            "a": "For giving the effect of merger, permanent consolidation adjustment of ` 250 lakh and current period consolidation adjustment of ` 45 lakh was made.",
+            "b": "For giving the effect of merger, permanent consolidation adjustment of ` 280 lakh and current period consolidation adjustment of ` 15 lakh was made.",
+            "c": "For giving the effect of merger permanent consolidation adjustment of ` 295 lakh.",
+            "d": "For giving the effect of merger, permanent consolidation adjustment of ` 265 lakh and current period consolidation adjustment of ` 30 lakh was made."
+        },
+        answer: "a",
+        reason: "Permanent consolidation adjustments are: (a) Determination of goodwill or capital reserve as per applicable accounting standards. (b) Determination of amount of equity attributable to minority/ non controlling interests. Current period consolidation adjustments primarily relate to the elimination of intra-group transactions and account balances including adjustments related to harmonising the different accounting policies being followed by the parent and its components."
+    },
+    {
+case: "Tom Ltd. is in to the business of manufacturing and distributing of Toys for the past 25 years. Since inception, the company has its own in-house dedicated internal audit department, having team of competent & qualified chartered accountants, headed by the Chief Internal Auditor, who with systematic and disciplined approach monitors various Internal Controls laid down at all levels of the functional areas. M/s Deva & Co., Chartered Accountants, have been newly appointed as the statutory auditors of the company for the F.Y. 2024-25.",
+topic: "Comparative Information",
+question: "M/s Deva & Co., in their auditor's report on the current period's financial statements, wants to report that Tom Ltd. does not want to make provision for doubtful debts in F.Y. 2024-25. Identify the correct action to be resorted out of the following:",
+options: {
+            "a": "As per SA 710, can modify their report for previous year's figures of financial statements since the auditor's report on the prior period, as previously issued, included a qualified opinion.",
+            "b": "As per SA 710, can modify their report for current year's figures of financial statements but need not refer to the previous year's modification.",
+            "c": "As per SA 710, will have to modify their report for both current and previous year's figures of financial statements since the auditor's report on the prior period, as previously issued, included a qualified opinion.",
+            "d": "As per SA 710, cannot modify their report but need to refer to the earlier year's modification."
+        },
+        answer: "c",
+        reason: "SA 710 states that if the auditor’s report on the prior period, as previously issued, included a qualified opinion and the matter which gave rise to the modification is unresolved, the auditor shall modify the auditor’s opinion on the current period’s financial statements."
+    },
+    {
+case: "XYZ & Associates LLP, is a firm of Chartered Accountants, consisting of 12 partners has been allotted Central statutory audit of Maha Bank Limited, a scheduled commercial bank. (i) As a part of the scope, the audit firm has been asked to find out the correct position of Demand and Time liabilities of Maha Bank. DTL balance as on 30th September 2024 was ` 50,000 Crore which included the following- [Table of DTL components]",
+topic: "NBFC Audit",
+question: "Keeping in view of the information in para (ii), Identify under which layer APP Ltd. will be categorised -",
+options: {
+            "a": "Top Layer",
+            "b": "Upper Layer",
+            "c": "Middle Layer",
+            "d": "Base Layer"
+        },
+        answer: "c",
+        reason: "The Middle Layer shall consist of all deposit taking NBFCs (NBFC-Ds), irrespective of asset size.Thus, APP Ltd. will be categorised under Middle Layer."
+    },
+    {
+case: "Arpan Films Ltd. is a distributor of movies in the state of West Bengal. The company has a significant interest in other operating segments and operates through multiple subsidiaries. At the consolidated level, major operating segments comprise of movie distribution, selling tea from self-owned tea gardens at Assam, real estate development for commercial purposes and investment in start-up entities. The Group was founded jointly by Mr. Rishu (the Group Managing Director) and Mr. Prashant, an old confidant of Mr. Rishu. Unfortunately, Mr. Rishu met with an accident and expired. His untimely death rattled the entire Group and disrupted the business operations of the Group. The Board of the Parent Company decided to induct his son – Mr. Vishu – as the Managing Director of the Parent Company and the Group. The appointment of Mr. Vishu enraged Mr. Prashant, and he filed an application of oppression of mismanagement with the National Company Law Tribunal alleging various wrongdoings, including inappropriate related party transactions, siphoning off funds through connected entities and manipulation of financial statements. Considering the gravity of the allegations, the existing auditor of the Parent Company tendered his resignation. The Board appointed Shubh and Laabh LLP as the new auditors. Shubh and Laabh LLP informed the previous auditor over the phone and accepted the appointment.",
+topic: "Professional Misconduct",
+question: "Is Shubh and Laabh LLP guilty of professional misconduct for accepting the audit of Arpan Films Ltd.?",
+options: {
+            "a": "Yes, Shubh and Laabh LLP are guilty of professional misconduct. The email response of the previous auditor does not include reasons for their resignation.",
+            "b": "Yes, Shubh and Laabh LLP are guilty of professional misconduct. As a matter of professional courtesy, Shubh and Laabh LLP should have intimated its appointment as auditor to the previous auditor through registered post (instead of sending an email).",
+            "c": "Yes, Shubh and Laabh LLP are guilty of professional misconduct. As a matter of professional courtesy, Shubh and Laabh LLP should not have intimated its appointment by telephone.",
+            "d": "Yes, Shubh and Laabh LLP are guilty of professional misconduct. As a matter of professional courtesy, Shubh and Laabh LLP should have communicated to the predecessor auditor via email before accepting appointment."
+        },
+        answer: "d",
+        reason: "As per Clause (8) of Part I of First Schedule to the Chartered Accountants Act, 1949, a Chartered Accountant in practice cannot accept a position as auditor previously held by another Chartered Accountant without first communicating with him in writing."
+    },
+  {
+case: "MINSAN Ltd. is experiencing financial decline and is planning to install new machinery to cut production costs. The audit team noted pending litigation, partial inventory verification, fraud incidents, and a show-cause notice from the Pollution Board. They are evaluating going concern assumptions and other risks.",
+    "topic": "Audit Procedures & Documentation",
+    question: "Which audit procedure is NOT relevant under SA 570 to assess going concern?",
+    options: {
+      "a": "Analysis and discussion with management on new machinery impact.",
+      "b": "Inquiry with legal counsel regarding litigation.",
+      "c": "Evaluating plans to regain market share.",
+      "d": "Analyzing past cash flows and comparing with projections."
+    },
+    answer: "d",
+    reason: "As per SA 570, analyzing past cash flows and comparing with projections is not directly related to going concern assessment. Other options are relevant procedures."
+  },
+  {
+       case: "XY & Associates are auditing ABC Enterprises, a Section 8 company. The audit noted improper fixed asset records and lack of physical verification. A debate arose on applicability of CARO reporting. The firm is also auditing QR Ltd. where there's disagreement on Key Audit Matters.",
+    "topic": "Audit Reporting Responsibilities",
+    question: "Is CARO, 2020 applicable to ABC Enterprises?",
+    options: {
+      "a": "No. It must be reported under clause (i) of CARO.",
+      "b": "Yes. CARO is not applicable to Section 8 companies.",
+      "c": "No. SA 240 applies instead.",
+      "d": "Yes. Auditor can choose to report or not based on materiality."
+    },
+    answer: "b",
+    reason: "CARO, 2020 is not applicable to companies licensed under Section 8 of the Companies Act, 2013."
+  },
+  {
+case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Risk Assessment & Internal Controls",
+    question: "What is the most significant independence threat in this case?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "d",
+    reason: "Providing non-audit services to an audit client can compromise objectivity and independence."
+  },
+  {
+case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that no documentation supported the estimate used.",
+    "topic": "Risk Assessment & Internal Controls",
+    question: "What is the primary ethical issue highlighted in this scenario?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "a",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Professional Ethics & Liabilities of Auditors",
+    question: "What is the primary ethical issue highlighted in this scenario?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "d",
+    reason: "Independence must be maintained at all times and gifts, associations, or services that threaten this must be avoided."
+  },
+  {
+case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a director had guaranteed a loan without board approval. The management explained that it was done to expedite operations. Further, the auditor discovered that required disclosures were omitted in the financial statements.",
+    "topic": "Statutory Compliance & Legal Issues",
+    question: "How should the auditor respond to this irregularity?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "c",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Independence & Conflict of Interest",
+    question: "What is the most significant independence threat in this case?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "c",
+    reason: "Disclosure of key matters is critical for transparency, especially under SA 701 regarding Key Audit Matters."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Statutory Compliance & Legal Issues",
+    question: "What reporting standard applies most directly to the auditor's actions here?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "a",
+    reason: "Disclosure of key matters is critical for transparency, especially under SA 701 regarding Key Audit Matters."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Statutory Compliance & Legal Issues",
+    question: "How should the auditor respond to this irregularity?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "b",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Professional Ethics & Liabilities of Auditors",
+    question: "What reporting standard applies most directly to the auditor's actions here?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "b",
+    reason: "The auditor's response must align with professional standards and legal responsibilities under SA 705 and SA 706."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Risk Assessment & Internal Controls",
+    question: "Which law or regulation is most relevant to this issue?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "b",
+    reason: "Providing non-audit services to an audit client can compromise objectivity and independence."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a director had guaranteed a loan without board approval. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Audit Reporting Responsibilities",
+    question: "What reporting standard applies most directly to the auditor's actions here?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "a",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a director had guaranteed a loan without board approval. The management explained that it was done to expedite operations. Further, the auditor discovered that required disclosures were omitted in the financial statements.",
+    "topic": "Corporate Governance & Auditor's Role",
+    question: "How should the auditor respond to this irregularity?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "a",
+    reason: "The auditor's response must align with professional standards and legal responsibilities under SA 705 and SA 706."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Corporate Governance & Auditor's Role",
+    question: "What is the primary ethical issue highlighted in this scenario?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "a",
+    reason: "Disclosure of key matters is critical for transparency, especially under SA 701 regarding Key Audit Matters."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that required disclosures were omitted in the financial statements.",
+    "topic": "Professional Ethics & Liabilities of Auditors",
+    question: "What reporting standard applies most directly to the auditor's actions here?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "c",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that the internal controls over cash disbursements were bypassed. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Professional Ethics & Liabilities of Auditors",
+    question: "Which audit procedure should the auditor prioritize in this situation?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "d",
+    reason: "Independence must be maintained at all times and gifts, associations, or services that threaten this must be avoided."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that the internal controls over cash disbursements were bypassed. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Corporate Governance & Auditor's Role",
+    question: "Which law or regulation is most relevant to this issue?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "c",
+    reason: "Independence must be maintained at all times and gifts, associations, or services that threaten this must be avoided."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Audit Procedures & Documentation",
+    question: "Which of the following presents the greatest risk to audit quality?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "b",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that the internal controls over cash disbursements were bypassed. The management explained that it was done to expedite operations. Further, the auditor discovered that no documentation supported the estimate used.",
+    "topic": "Audit Reporting Responsibilities",
+    question: "What is the correct reporting action for the auditor under these circumstances?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "b",
+    reason: "The auditor's response must align with professional standards and legal responsibilities under SA 705 and SA 706."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a director had guaranteed a loan without board approval. The management explained that it was done to expedite operations. Further, the auditor discovered that required disclosures were omitted in the financial statements.",
+    "topic": "Risk Assessment & Internal Controls",
+    question: "Which law or regulation is most relevant to this issue?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "a",
+    reason: "The auditor's response must align with professional standards and legal responsibilities under SA 705 and SA 706."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that the internal controls over cash disbursements were bypassed. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Cybersecurity & Technology Risk in Auditing",
+    question: "What is the primary ethical issue highlighted in this scenario?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "b",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Independence & Conflict of Interest",
+    question: "Which of the following presents the greatest risk to audit quality?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "b",
+    reason: "Disclosure of key matters is critical for transparency, especially under SA 701 regarding Key Audit Matters."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a director had guaranteed a loan without board approval. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Audit Procedures & Documentation",
+    question: "What reporting standard applies most directly to the auditor's actions here?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "a",
+    reason: "Independence must be maintained at all times and gifts, associations, or services that threaten this must be avoided."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Professional Ethics & Liabilities of Auditors",
+    question: "What is the most significant independence threat in this case?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "c",
+    reason: "Disclosure of key matters is critical for transparency, especially under SA 701 regarding Key Audit Matters."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Statutory Compliance & Legal Issues",
+    question: "How should the auditor respond to this irregularity?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "a",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Professional Ethics & Liabilities of Auditors",
+    question: "Which law or regulation is most relevant to this issue?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "b",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that the internal controls over cash disbursements were bypassed. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Independence & Conflict of Interest",
+    question: "Which audit procedure should the auditor prioritize in this situation?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "c",
+    reason: "Disclosure of key matters is critical for transparency, especially under SA 701 regarding Key Audit Matters."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Audit Procedures & Documentation",
+    question: "Which law or regulation is most relevant to this issue?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "b",
+    reason: "The auditor's response must align with professional standards and legal responsibilities under SA 705 and SA 706."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Risk Assessment & Internal Controls",
+    question: "What is the most significant independence threat in this case?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "b",
+    reason: "Providing non-audit services to an audit client can compromise objectivity and independence."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Professional Ethics & Liabilities of Auditors",
+    question: "Which of the following presents the greatest risk to audit quality?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "d",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that the internal controls over cash disbursements were bypassed. The management explained that it was done to expedite operations. Further, the auditor discovered that no documentation supported the estimate used.",
+    "topic": "Corporate Governance & Auditor's Role",
+    question: "Which of the following presents the greatest risk to audit quality?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "d",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered that required disclosures were omitted in the financial statements.",
+    "topic": "Statutory Compliance & Legal Issues",
+    question: "Which audit procedure should the auditor prioritize in this situation?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "c",
+    reason: "The auditor's response must align with professional standards and legal responsibilities under SA 705 and SA 706."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Corporate Governance & Auditor's Role",
+    question: "Which law or regulation is most relevant to this issue?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "c",
+    reason: "Independence must be maintained at all times and gifts, associations, or services that threaten this must be avoided."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that the internal controls over cash disbursements were bypassed. The management explained that it was done to expedite operations. Further, the auditor discovered that required disclosures were omitted in the financial statements.",
+    "topic": "Audit Reporting Responsibilities",
+    question: "What is the primary ethical issue highlighted in this scenario?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "c",
+    reason: "Providing non-audit services to an audit client can compromise objectivity and independence."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that no documentation supported the estimate used.",
+    "topic": "Independence & Conflict of Interest",
+    question: "Which audit procedure should the auditor prioritize in this situation?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "c",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a director had guaranteed a loan without board approval. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Audit Procedures & Documentation",
+    question: "How should the auditor respond to this irregularity?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "c",
+    reason: "The auditor's response must align with professional standards and legal responsibilities under SA 705 and SA 706."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that no documentation supported the estimate used.",
+    "topic": "Cybersecurity & Technology Risk in Auditing",
+    question: "What is the correct reporting action for the auditor under these circumstances?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "d",
+    reason: "Providing non-audit services to an audit client can compromise objectivity and independence."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Cybersecurity & Technology Risk in Auditing",
+    question: "How should the auditor respond to this irregularity?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "d",
+    reason: "The auditor's response must align with professional standards and legal responsibilities under SA 705 and SA 706."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that required disclosures were omitted in the financial statements.",
+    "topic": "Risk Assessment & Internal Controls",
+    question: "What is the primary ethical issue highlighted in this scenario?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "a",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a director had guaranteed a loan without board approval. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Statutory Compliance & Legal Issues",
+    question: "Which audit procedure should the auditor prioritize in this situation?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "c",
+    reason: "Disclosure of key matters is critical for transparency, especially under SA 701 regarding Key Audit Matters."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that the internal controls over cash disbursements were bypassed. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Cybersecurity & Technology Risk in Auditing",
+    question: "What is the most significant independence threat in this case?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "b",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a director had guaranteed a loan without board approval. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Audit Reporting Responsibilities",
+    question: "What is the most significant independence threat in this case?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "a",
+    reason: "Providing non-audit services to an audit client can compromise objectivity and independence."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Professional Ethics & Liabilities of Auditors",
+    question: "What is the most significant independence threat in this case?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "c",
+    reason: "The auditor's response must align with professional standards and legal responsibilities under SA 705 and SA 706."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that a key accounting estimate was made without sufficient basis. The management explained that it was done to expedite operations. Further, the auditor discovered that no documentation supported the estimate used.",
+    "topic": "Independence & Conflict of Interest",
+    question: "What is the most significant independence threat in this case?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "c",
+    reason: "Independence must be maintained at all times and gifts, associations, or services that threaten this must be avoided."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Cybersecurity & Technology Risk in Auditing",
+    question: "Which of the following presents the greatest risk to audit quality?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "d",
+    reason: "Disclosure of key matters is critical for transparency, especially under SA 701 regarding Key Audit Matters."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed that the internal controls over cash disbursements were bypassed. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Risk Assessment & Internal Controls",
+    question: "What is the correct reporting action for the auditor under these circumstances?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "d",
+    reason: "Providing non-audit services to an audit client can compromise objectivity and independence."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered that required disclosures were omitted in the financial statements.",
+    "topic": "Audit Reporting Responsibilities",
+    question: "Which law or regulation is most relevant to this issue?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "b",
+    reason: "Disclosure of key matters is critical for transparency, especially under SA 701 regarding Key Audit Matters."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered that no documentation supported the estimate used.",
+    "topic": "Statutory Compliance & Legal Issues",
+    question: "What is the primary ethical issue highlighted in this scenario?",
+    options: {
+      "a": "Withdraw from the engagement.",
+      "b": "Issue a qualified opinion.",
+      "c": "Include an EOM paragraph.",
+      "d": "Accept management's explanations."
+    },
+    answer: "a",
+    reason: "Independence must be maintained at all times and gifts, associations, or services that threaten this must be avoided."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Statutory Compliance & Legal Issues",
+    question: "Which law or regulation is most relevant to this issue?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "a",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered that required disclosures were omitted in the financial statements.",
+    "topic": "Audit Reporting Responsibilities",
+    question: "How should the auditor respond to this irregularity?",
+    options: {
+      "a": "Breach of confidentiality.",
+      "b": "Conflict of interest.",
+      "c": "Overreliance on experts.",
+      "d": "Violation of audit standards."
+    },
+    answer: "b",
+    reason: "Providing non-audit services to an audit client can compromise objectivity and independence."
+  },
+  {
+     
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered the finance manager had previously worked for the same vendor involved in the transaction.",
+    "topic": "Audit Procedures & Documentation",
+    question: "What is the correct reporting action for the auditor under these circumstances?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "a",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+  },
+  {
+    case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed an unusual transaction with a related party. The management explained that it was done to expedite operations. Further, the auditor discovered that the engagement partner received hospitality from the client\u2019s CEO.",
+    "topic": "Cybersecurity & Technology Risk in Auditing",
+    question: "What is the correct reporting action for the auditor under these circumstances?",
+    options: {
+      "a": "Inadequate documentation.",
+      "b": "Lack of independence.",
+      "c": "Improper disclosures.",
+      "d": "Insufficient audit evidence."
+    },
+    answer: "d",
+    reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
+    },
+            ];
+
+        // --- DOM Elements ---
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const reviewScreen = document.getElementById('review-screen');
+
+        const startBtn = document.getElementById('start-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const reviewBtn = document.getElementById('review-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const newTestBtn = document.getElementById('new-test-btn');
+        const generateScenarioBtn = document.getElementById('generate-scenario-btn');
+        const getFeedbackBtn = document.getElementById('get-feedback-btn');
+
+
+        const questionNumberEl = document.getElementById('question-number');
+        const scoreEl = document.getElementById('score');
+        const caseScenarioTextEl = document.getElementById('case-scenario-text');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainerEl = document.getElementById('options-container');
+        const finalScoreEl = document.getElementById('final-score');
+        const finalScoreEmojiEl = document.getElementById('final-score-emoji');
+        const timeTakenEl = document.getElementById('time-taken');
+        const answeredCountEl = document.getElementById('answered-count');
+        const reviewContentEl = document.getElementById('review-content');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const finalTotalScoreEl = document.getElementById('final-total-score');
+        const newScenarioContainer = document.getElementById('new-scenario-container');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const timerEl = document.getElementById('timer');
+
+        // --- State ---
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let currentScore = 0;
+        let quizSessionData = [];
+        let timerInterval = null;
+        let startTime = 0;
+
+        // --- Gemini API Configuration ---
+        const API_KEY = ""; // This will be handled by the environment.
+        const API_URL_GEMINI = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+
+        
+        // --- Quiz Functions ---
+        
+        function shuffle(array) {
+            let currentIndex = array.length,  randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = String(Math.floor(elapsedTime / 60)).padStart(2, '0');
+            const seconds = String(elapsedTime % 60).padStart(2, '0');
+            timeTakenEl.textContent = `${minutes}:${seconds}`;
+        }
+
+        function updateTimer() {
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = String(Math.floor(elapsedTime / 60)).padStart(2, '0');
+            const seconds = String(elapsedTime % 60).padStart(2, '0');
+            timerEl.textContent = `${minutes}:${seconds}`;
+        }
+
+        function startQuiz() {
+            const testSize = 15;
+            const shuffledLibrary = shuffle([...quizData]);
+            quizSessionData = shuffledLibrary.slice(0, testSize); // Create a 15-question test for the session
+            currentQuestionIndex = 0;
+            userAnswers = new Array(quizSessionData.length).fill(null);
+            currentScore = 0;
+            scoreEl.textContent = '0';
+            totalQuestionsEl.textContent = testSize;
+            finalTotalScoreEl.textContent = testSize * 2;
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            resultScreen.classList.add('hidden');
+            reviewScreen.classList.add('hidden');
+            loadQuestion(currentQuestionIndex);
+            startTimer();
+        }
+
+        function loadQuestion(index) {
+            const questionData = quizSessionData[index];
+            questionNumberEl.textContent = index + 1;
+            caseScenarioTextEl.textContent = questionData.case;
+            questionTextEl.textContent = `${questionData.question}`;
+            optionsContainerEl.innerHTML = '';
+
+            for (const key in questionData.options) {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option-label bg-gray-700 p-4 rounded-lg cursor-pointer flex items-center';
+                
+                const radioInput = document.createElement('input');
+                radioInput.type = 'radio';
+                radioInput.name = 'option';
+                radioInput.value = key;
+                radioInput.id = `option-${key}`;
+                radioInput.className = 'mr-4 h-5 w-5 text-indigo-600 bg-gray-900 border-gray-600 focus:ring-indigo-500';
+
+                if (userAnswers[index] === key) {
+                    radioInput.checked = true;
+                }
+
+                const label = document.createElement('label');
+                label.htmlFor = `option-${key}`;
+                label.textContent = `${key.toUpperCase()}. ${questionData.options[key]}`;
+                label.className = 'w-full cursor-pointer';
+
+                optionDiv.appendChild(radioInput);
+                optionDiv.appendChild(label);
+                optionsContainerEl.appendChild(optionDiv);
+
+                optionDiv.addEventListener('click', () => {
+                    radioInput.checked = true;
+                    handleOptionSelect(index, key);
+                });
+            }
+            updateNavigation();
+        }
+        
+        function handleOptionSelect(questionIndex, selectedOption) {
+            userAnswers[questionIndex] = selectedOption;
+            calculateScore(); // Update score live
+        }
+
+        function updateNavigation() {
+            prevBtn.disabled = currentQuestionIndex === 0;
+            prevBtn.classList.toggle('opacity-50', currentQuestionIndex === 0);
+            
+            if (currentQuestionIndex === quizSessionData.length - 1) {
+                nextBtn.classList.add('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+            }
+        }
+
+        function getScoreEmoji(score, maxScore) {
+            if (maxScore === 0) return '🤔';
+            const percentage = (score / maxScore) * 100;
+            if (percentage >= 80) return '🎉';
+            if (percentage >= 51) return '😊';
+            if (percentage >= 25) return '😔';
+            return '😥';
+        }
+
+        function calculateScore() {
+            currentScore = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer !== null && answer === quizSessionData[index].answer) {
+                    currentScore += 2;
+                }
+            });
+            scoreEl.textContent = currentScore;
+        }
+
+        function showResults() {
+            stopTimer();
+            calculateScore(); // Final calculation
+            const answeredQuestions = userAnswers.filter(a => a !== null).length;
+            const maxPossibleScore = answeredQuestions * 2;
+            
+            finalScoreEl.textContent = currentScore;
+            finalTotalScoreEl.textContent = maxPossibleScore;
+            answeredCountEl.textContent = answeredQuestions;
+            finalScoreEmojiEl.textContent = getScoreEmoji(currentScore, maxPossibleScore);
+            
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+        }
+
+        function showReview() {
+            resultScreen.classList.add('hidden');
+            reviewScreen.classList.remove('hidden');
+            reviewContentEl.innerHTML = '';
+
+            quizSessionData.forEach((question, index) => {
+                if(userAnswers[index] === null) return; // Skip unanswered questions in review
+
+                const userAnswer = userAnswers[index];
+                const correctAnswer = question.answer;
+                const isCorrect = userAnswer === correctAnswer;
+
+                const reviewCard = document.createElement('div');
+                reviewCard.className = 'bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700';
+
+                let reviewHTML = `
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold text-indigo-400">Case Scenario</h3>
+                        <p class="text-sm text-gray-400 mt-2">${question.case}</p>
+                    </div>
+                    <p class="font-semibold text-lg mb-4">${index + 1}. ${question.question}</p>
+                    <div class="space-y-3">
+                `;
+                
+                for (const key in question.options) {
+                    let optionClass = 'bg-gray-700';
+                    if (key === correctAnswer) {
+                        optionClass = 'correct-answer text-white';
+                    } else if (key === userAnswer && !isCorrect) {
+                        optionClass = 'selected-incorrect text-white';
+                    }
+                    
+                    reviewHTML += `<div class="p-3 rounded-lg ${optionClass}">${key.toUpperCase()}. ${question.options[key]}</div>`;
+                }
+
+                reviewHTML += `
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-700">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-semibold text-green-400">Explanation:</h4>
+                            <button class="gemini-btn" onclick="getAlternativeExplanation(${index}, this)">✨ Explain Differently</button>
+                        </div>
+                        <p class="text-gray-300 mt-1" id="reason-${index}">${question.reason}</p>
+                        <div class="text-gray-400 mt-2 text-sm" id="gemini-explanation-${index}"></div>
+                    </div>
+                `;
+
+                reviewCard.innerHTML = reviewHTML;
+                reviewContentEl.appendChild(reviewCard);
+            });
+        }
+        
+        function resetAndStart() {
+            resetQuiz();
+            startQuiz();
+        }
+
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            currentScore = 0;
+            quizSessionData = [];
+            scoreEl.textContent = '0';
+            reviewScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            feedbackContainer.classList.add('hidden');
+            newScenarioContainer.classList.add('hidden');
+            timerEl.textContent = '00:00';
+            if (timerInterval) clearInterval(timerInterval);
+        }
+
+        function toggleAnswer(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.classList.toggle('hidden');
+            }
+        }
+
+        // --- Gemini API Functions ---
+
+        async function getAIFeedback() {
+            getFeedbackBtn.disabled = true;
+            feedbackContainer.classList.remove('hidden');
+            feedbackContainer.innerHTML = '<div class="loader"></div>';
+
+            const incorrectAnswers = quizSessionData.filter((_, index) => userAnswers[index] !== null && userAnswers[index] !== quizSessionData[index].answer);
+
+            if (incorrectAnswers.length === 0) {
+                feedbackContainer.innerHTML = '<p class="text-green-400 font-semibold">Congratulations! You answered all attempted questions correctly. Great job!</p>';
+                getFeedbackBtn.disabled = false;
+                return;
+            }
+
+            const topics = incorrectAnswers.map(q => q.topic).join(', ');
+            const prompt = `I am an auditing student. I took a multiple-choice test and got the following questions wrong. The topics covered in these questions were: ${topics}. 
+            
+            Please analyze my performance. 
+            1. Identify the key themes or concepts where I seem to be struggling.
+            2. Provide a brief, encouraging summary of my performance.
+            3. Suggest 2-3 specific areas or Auditing Standards (SAs) I should focus on for my revision.
+            
+            Keep the feedback concise and helpful.`;
+
+            try {
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                const response = await fetch(API_URL_GEMINI, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
+                    // Simple markdown to HTML conversion
+                    let feedbackText = result.candidates[0].content.parts[0].text;
+                    feedbackText = feedbackText.replace(/\*\*(.*?)\*\*/g, '<strong class="text-purple-400">$1</strong>'); // Bold
+                    feedbackText = feedbackText.replace(/\n/g, '<br>'); // Newlines
+                    feedbackContainer.innerHTML = `<p>${feedbackText}</p>`;
+                } else {
+                    throw new Error("Invalid response structure from API");
+                }
+            } catch (error) {
+                console.error("Gemini API error:", error);
+                feedbackContainer.innerHTML = `<p class="text-red-400">Sorry, couldn't generate feedback right now.</p>`;
+            } finally {
+                getFeedbackBtn.disabled = false;
+            }
+        }
+
+        async function getAlternativeExplanation(index, button) {
+            const questionData = quizSessionData[index];
+            const explanationContainer = document.getElementById(`gemini-explanation-${index}`);
+            
+            button.disabled = true;
+            explanationContainer.innerHTML = '<div class="loader"></div>';
+
+            const prompt = `The following is an audit-related multiple-choice question, the correct answer, and the reason.
+            Question: "${questionData.question}"
+            Correct Answer: "${questionData.options[questionData.answer]}"
+            Reason: "${questionData.reason}"
+            Please explain the core concept behind this answer in a different way. Use an analogy or a simple example to make it easier to understand for a student. Keep it concise.`;
+
+            try {
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                const response = await fetch(API_URL_GEMINI, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
+                    explanationContainer.innerHTML = `<p class="bg-gray-900 p-3 rounded-md border border-violet-500">${result.candidates[0].content.parts[0].text}</p>`;
+                } else {
+                    throw new Error("Invalid response structure from API");
+                }
+            } catch (error) {
+                console.error("Gemini API error:", error);
+                explanationContainer.innerHTML = `<p class="text-red-400">Sorry, couldn't generate an explanation right now.</p>`;
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        async function generateNewScenario() {
+            const topic = document.getElementById('topic-selector').value;
+            generateScenarioBtn.disabled = true;
+            newScenarioContainer.classList.remove('hidden');
+            newScenarioContainer.innerHTML = '<div class="loader"></div>';
+
+            const prompt = `You are an expert in creating educational content for advanced auditing students. Your task is to generate a practice problem.
+            First, create a new, detailed case scenario that mixes multiple concepts related to the primary audit topic of "${topic}".
+            Second, based on that single scenario, create an array of exactly 5 challenging multiple-choice questions.
+            Third, for each question, provide four options (a, b, c, d), the correct answer key (e.g., "c"), and a brief, clear reason for the correct answer.
+            Finally, you MUST return the entire output as a single, valid JSON object. Do not include any text or formatting outside of this JSON object. The JSON object must have these exact keys: "case" (a string for the scenario) and "questions" (an array of 5 question objects). Each question object in the array must have these exact keys: "question", "options" (an object with a,b,c,d keys), "answer", and "reason".`;
+            
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    "case": { "type": "STRING" },
+                    "questions": {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                "question": { "type": "STRING" },
+                                "options": {
+                                    type: "OBJECT",
+                                    properties: {
+                                        "a": { "type": "STRING" },
+                                        "b": { "type": "STRING" },
+                                        "c": { "type": "STRING" },
+                                        "d": { "type": "STRING" }
+                                    }
+                                },
+                                "answer": { "type": "STRING" },
+                                "reason": { "type": "STRING" }
+                            }
+                        }
+                    }
+                }
+            };
+
+            try {
+                const payload = {
+                    contents: [{ role: "user", parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: schema
+                    }
+                };
+                const response = await fetch(API_URL_GEMINI, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
+                    const jsonText = result.candidates[0].content.parts[0].text;
+                    
+                    let generatedData;
+                    try {
+                        generatedData = JSON.parse(jsonText);
+                    } catch (parseError) {
+                         console.error("JSON Parsing Error:", parseError, "Received text:", jsonText);
+                         throw new Error("Failed to parse the AI-generated scenario. The response was not valid JSON.");
+                    }
+
+                    let scenarioHTML = `
+                        <h4 class="text-lg font-bold text-indigo-400 mb-2">New AI-Generated Case Scenario</h4>
+                        <p class="text-sm text-gray-300 mb-4">${generatedData.case}</p>
+                        <hr class="border-gray-600 my-4">
+                    `;
+                    
+                    if (generatedData.questions && Array.isArray(generatedData.questions)) {
+                        generatedData.questions.forEach((q, index) => {
+                            scenarioHTML += `
+                                <div class="my-4 p-4 bg-gray-800 rounded-lg">
+                                    <h5 class="font-semibold text-gray-200 mb-2">${index + 1}. ${q.question}</h5>
+                                    <div class="space-y-2 mb-2 text-sm">
+                                        <p class="p-2 bg-gray-700 rounded-md">a. ${q.options.a}</p>
+                                        <p class="p-2 bg-gray-700 rounded-md">b. ${q.options.b}</p>
+                                        <p class="p-2 bg-gray-700 rounded-md">c. ${q.options.c}</p>
+                                        <p class="p-2 bg-gray-700 rounded-md">d. ${q.options.d}</p>
+                                    </div>
+                                    <div class="pt-2">
+                                       <button onclick="toggleAnswer('gen-ans-${index}')" class="text-xs text-indigo-400 hover:underline">Show/Hide Answer</button>
+                                       <div id="gen-ans-${index}" class="hidden mt-2 text-sm">
+                                           <p class="font-semibold text-green-400">Correct Answer: ${q.answer.toUpperCase()}</p>
+                                           <p class="text-gray-400 mt-1">${q.reason}</p>
+                                       </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        throw new Error("Generated JSON does not contain a 'questions' array.");
+                    }
+
+                    newScenarioContainer.innerHTML = scenarioHTML;
+
+                } else {
+                     let errorMessage = "Invalid response structure from API.";
+                     if (result.promptFeedback && result.promptFeedback.blockReason) {
+                         errorMessage = `Content generation was blocked. Reason: ${result.promptFeedback.blockReason}. Please try a different topic.`;
+                     } else if (result.candidates && result.candidates.length > 0 && result.candidates[0].finishReason !== 'STOP') {
+                         errorMessage = `Content generation stopped unexpectedly. Reason: ${result.candidates[0].finishReason}. Please try again.`;
+                     }
+                     throw new Error(errorMessage);
+                }
+            } catch (error) {
+                console.error("Gemini API error:", error);
+                newScenarioContainer.innerHTML = `<p class="text-red-400">Sorry, an error occurred while generating the scenario: ${error.message}. Please try again.</p>`;
+            } finally {
+                generateScenarioBtn.disabled = false;
+            }
+        }
+
+        // --- Event Listeners ---
+        startBtn.addEventListener('click', startQuiz);
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < quizSessionData.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+            }
+        });
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion(currentQuestionIndex);
+            }
+        });
+        submitBtn.addEventListener('click', showResults);
+        reviewBtn.addEventListener('click', showReview);
+        restartBtn.addEventListener('click', resetQuiz);
+        newTestBtn.addEventListener('click', resetAndStart);
+        generateScenarioBtn.addEventListener('click', generateNewScenario);
+        getFeedbackBtn.addEventListener('click', getAIFeedback);
+        
+    </script>
+</body>
+</html>
