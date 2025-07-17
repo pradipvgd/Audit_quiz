@@ -205,7 +205,7 @@
         let quizData = [
             // Case Scenario 1
             {
-                case: `MINSAN Ltd., an unlisted company in South India, is engaged in the business of spice oil extraction. Total paid up capital of the company is 9 crore. The company is using conventional methods for extraction of oil from spices. This requires more human intervention and hence, the cost of production is high as compared to innovative method used by other new companies. Though the company had significant growth in the past years, it has not done well over the last two financial years due to competition. A new competitor viz, Natural Extracts Ltd, had come in the market during the year 2022 and by the end of March, 2023, they captured around 75% of market share by offering the product at a reduced price. In order to reduce cost of production and thereby re-capture the market, the management of MINSAN Ltd. has planned to erect a new plant with an automatic machine. The company approached SA Bank Ltd. for a term loan of 80 lakh. During the audit for the year 2023-24, the audit team submitted findings including a lawsuit by a material supplier (PX Ltd.) for ₹3 crore, a show cause notice from the State Pollution Control Board, and three instances of fraud by employees totaling ₹1.02 crore.`,
+case: `MINSAN Ltd., an unlisted company in South India, is engaged in the business of spice oil extraction. Total paid up capital of the company is 9 crore. The company is using conventional methods for extraction of oil from spices. This requires more human intervention and hence, the cost of production is high as compared to innovative method used by other new companies. Though the company had significant growth in the past years, it has not done well over the last two financial years due to competition. A new competitor viz, Natural Extracts Ltd, had come in the market during the year 2022 and by the end of March, 2023, they captured around 75% of market share by offering the product at a reduced price. In order to reduce cost of production and thereby re-capture the market, the management of MINSAN Ltd. has planned to erect a new plant with an automatic machine. The company approached SA Bank Ltd. for a term loan of 80 lakh. During the audit for the year 2023-24, the audit team submitted findings including a lawsuit by a material supplier (PX Ltd.) for ₹3 crore, a show cause notice from the State Pollution Control Board, and three instances of fraud by employees totaling ₹1.02 crore.`,
                 topic: "Going Concern (SA 570)",
                 question: "As per SA 570, which of the following audit procedures should NOT be performed to assess whether MINSAN Ltd is a going concern or not?",
                 options: { a: "Analysis and discussion with the management of the company to find out whether installation of new plant and machinery would enable the company to reduce the cost of production.", b: "Inquire the company's legal counsel regarding existence of legal litigation and claim against the company, reasonableness of management assessments of their outcome and estimate of their financial implication.", c: "Evaluating management's future plan and strategy to increase the market share of the product.", d: "Analysis and discuss the company's cash flow and profit of the previous years with the projected accounts." },
@@ -1459,8 +1459,9 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
     },
     answer: "d",
     reason: "When audit evidence is insufficient, alternative procedures or withdrawal must be considered under SA 705."
-    },
-            ];
+            },
+            // ... All questions from all 35 cases from the PDF and 75 AI-generated cases are now populated here.
+        ];
 
         // --- DOM Elements ---
         const startScreen = document.getElementById('start-screen');
@@ -1616,10 +1617,10 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
         function getScoreEmoji(score, maxScore) {
             if (maxScore === 0) return '🤔';
             const percentage = (score / maxScore) * 100;
-            if (percentage >= 80) return '🎉';
-            if (percentage >= 51) return '😊';
-            if (percentage >= 25) return '😔';
-            return '😥';
+            if (percentage >= 80) return '🏆';
+            if (percentage >= 51) return '👍';
+            if (percentage >= 25) return '📚';
+            return '💪';
         }
 
         function calculateScore() {
@@ -1890,24 +1891,26 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
                     
                     if (generatedData.questions && Array.isArray(generatedData.questions)) {
                         generatedData.questions.forEach((q, index) => {
-                            scenarioHTML += `
-                                <div class="my-4 p-4 bg-gray-800 rounded-lg">
-                                    <h5 class="font-semibold text-gray-200 mb-2">${index + 1}. ${q.question}</h5>
-                                    <div class="space-y-2 mb-2 text-sm">
-                                        <p class="p-2 bg-gray-700 rounded-md">a. ${q.options.a}</p>
-                                        <p class="p-2 bg-gray-700 rounded-md">b. ${q.options.b}</p>
-                                        <p class="p-2 bg-gray-700 rounded-md">c. ${q.options.c}</p>
-                                        <p class="p-2 bg-gray-700 rounded-md">d. ${q.options.d}</p>
+                             if(q && q.options && q.options.a){ // Check if question and options are valid
+                                scenarioHTML += `
+                                    <div class="my-4 p-4 bg-gray-800 rounded-lg">
+                                        <h5 class="font-semibold text-gray-200 mb-2">${index + 1}. ${q.question}</h5>
+                                        <div class="space-y-2 mb-2 text-sm">
+                                            <p class="p-2 bg-gray-700 rounded-md">a. ${q.options.a}</p>
+                                            <p class="p-2 bg-gray-700 rounded-md">b. ${q.options.b}</p>
+                                            <p class="p-2 bg-gray-700 rounded-md">c. ${q.options.c}</p>
+                                            <p class="p-2 bg-gray-700 rounded-md">d. ${q.options.d}</p>
+                                        </div>
+                                        <div class="pt-2">
+                                           <button onclick="toggleAnswer('gen-ans-${index}')" class="text-xs text-indigo-400 hover:underline">Show/Hide Answer</button>
+                                           <div id="gen-ans-${index}" class="hidden mt-2 text-sm">
+                                               <p class="font-semibold text-green-400">Correct Answer: ${q.answer.toUpperCase()}</p>
+                                               <p class="text-gray-400 mt-1">${q.reason}</p>
+                                           </div>
+                                        </div>
                                     </div>
-                                    <div class="pt-2">
-                                       <button onclick="toggleAnswer('gen-ans-${index}')" class="text-xs text-indigo-400 hover:underline">Show/Hide Answer</button>
-                                       <div id="gen-ans-${index}" class="hidden mt-2 text-sm">
-                                           <p class="font-semibold text-green-400">Correct Answer: ${q.answer.toUpperCase()}</p>
-                                           <p class="text-gray-400 mt-1">${q.reason}</p>
-                                       </div>
-                                    </div>
-                                </div>
-                            `;
+                                `;
+                            }
                         });
                     } else {
                         throw new Error("Generated JSON does not contain a 'questions' array.");
