@@ -46,35 +46,6 @@
              background-color: #F87171; /* Lighter Red */
              border: 2px solid #EF4444;
         }
-        .gemini-btn {
-            background-color: #8b5cf6;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: background-color 0.2s;
-        }
-        .gemini-btn:hover {
-            background-color: #7c3aed;
-        }
-        .gemini-btn:disabled {
-            background-color: #a78bfa;
-            cursor: not-allowed;
-        }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #8b5cf6;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            margin: 1rem auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4">
@@ -84,8 +55,7 @@
         <!-- Start Screen -->
         <div id="start-screen" class="text-center bg-gray-800 p-8 rounded-2xl shadow-2xl">
             <h1 class="text-4xl font-bold text-white mb-4">Advanced Auditing & Ethics MCQ Test</h1>
-            <p class="text-lg text-gray-400 mb-2">Practice from a massive library of randomized questions.</p>
-            <p class="text-lg text-gray-400 mb-6">Now with ✨ AI-powered explanations and scenario generation!</p>
+            <p class="text-lg text-gray-400 mb-6">Practice with a randomized 15-question quiz from a massive library.</p>
             <button id="start-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
                 Start Test
             </button>
@@ -111,10 +81,16 @@
                 <div id="options-container" class="space-y-4"></div>
             </div>
 
-            <div class="flex justify-between mt-8">
-                <button id="prev-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition">Previous</button>
-                <button id="submit-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition">Submit Test</button>
-                <button id="next-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition">Next</button>
+            <div class="flex justify-between items-center mt-8">
+                <div class="flex items-center">
+                    <input type="checkbox" id="mark-for-review-checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    <label for="mark-for-review-checkbox" class="ml-2 block text-sm text-gray-300">Mark for Review</label>
+                </div>
+                <div class="flex gap-4">
+                    <button id="prev-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition">Previous</button>
+                    <button id="submit-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition">Submit Test</button>
+                    <button id="next-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition">Next</button>
+                </div>
             </div>
         </div>
 
@@ -124,53 +100,23 @@
             <p class="text-2xl text-gray-300 mb-2">Your Final Score:</p>
             <p class="text-6xl font-extrabold text-indigo-400 mb-2"><span id="final-score-emoji"></span> <span id="final-score"></span> / <span id="final-total-score"></span></p>
             <p class="text-lg text-gray-400 mb-8">You answered <span id="answered-count"></span> questions in <span id="time-taken"></span>.</p>
-            <div class="flex flex-wrap justify-center gap-4">
-                <button id="review-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
-                    Review Answers
+            
+            <!-- Topic Performance -->
+            <div id="topic-performance-container" class="mt-8 pt-6 border-t border-gray-700 text-left">
+                 <h3 class="text-2xl font-bold text-white text-center mb-4">Topic Performance</h3>
+                 <div id="topic-performance-list" class="space-y-2"></div>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4 mt-8">
+                <button id="review-all-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
+                    Review All Answers
                 </button>
-                 <button id="get-feedback-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
-                    ✨ Get AI Feedback
+                 <button id="review-marked-btn" class="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
+                    Review Marked
                 </button>
                  <button id="new-test-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
                     Start New Test
                 </button>
-            </div>
-             <!-- Gemini Feature: AI Feedback -->
-            <div id="feedback-container" class="mt-6 text-left hidden bg-gray-900 p-6 rounded-lg border border-gray-700">
-                <!-- AI Feedback will appear here -->
-            </div>
-
-            <!-- Gemini Feature: Generate New Scenario -->
-            <div id="gemini-scenario-generator" class="mt-10 pt-6 border-t border-gray-700">
-                <h3 class="text-2xl font-bold text-white mb-4">Practice More with AI ✨</h3>
-                <p class="text-gray-400 mb-4">Select a topic to generate a new case scenario and questions.</p>
-                <div class="flex justify-center items-center gap-4">
-                    <select id="topic-selector" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-2.5">
-                        <option>Quality Control</option>
-                        <option>General Auditing Principles and Auditors' Responsibilities</option>
-                        <option>Audit Planning, Strategy, and Execution</option>
-                        <option>Materiality, Risk Assessment, and Internal Control</option>
-                        <option>Audit Evidence</option>
-                        <option>Completion and Review</option>
-                        <option>Reporting</option>
-                        <option>Specialised Areas</option>
-                        <option>Related Services</option>
-                        <option>Review of Financial Information</option>
-                        <option>Prospective Financial Information and Other Assurance Services</option>
-                        <option>Digital Auditing & Assurance</option>
-                        <option>Group Audits</option>
-                        <option>Audit of Banks & Non-Banking Financial Companies</option>
-                        <option>Audit of Public Sector Undertakings</option>
-                        <option>Internal Audit</option>
-                        <option>Due Diligence, Investigation & Forensic Accounting</option>
-                        <option>ESG Assurance</option>
-                        <option>Professional Ethics & Liabilities of Auditors</option>
-                    </select>
-                    <button id="generate-scenario-btn" class="gemini-btn">Generate Scenario</button>
-                </div>
-                <div id="new-scenario-container" class="mt-6 text-left hidden bg-gray-900 p-6 rounded-lg border border-gray-700">
-                    <!-- Generated content will appear here -->
-                </div>
             </div>
         </div>
 
@@ -205,7 +151,7 @@
         let quizData = [
             // Case Scenario 1
             {
-case: `MINSAN Ltd., an unlisted company in South India, is engaged in the business of spice oil extraction. Total paid up capital of the company is 9 crore. The company is using conventional methods for extraction of oil from spices. This requires more human intervention and hence, the cost of production is high as compared to innovative method used by other new companies. Though the company had significant growth in the past years, it has not done well over the last two financial years due to competition. A new competitor viz, Natural Extracts Ltd, had come in the market during the year 2022 and by the end of March, 2023, they captured around 75% of market share by offering the product at a reduced price. In order to reduce cost of production and thereby re-capture the market, the management of MINSAN Ltd. has planned to erect a new plant with an automatic machine. The company approached SA Bank Ltd. for a term loan of 80 lakh. During the audit for the year 2023-24, the audit team submitted findings including a lawsuit by a material supplier (PX Ltd.) for ₹3 crore, a show cause notice from the State Pollution Control Board, and three instances of fraud by employees totaling ₹1.02 crore.`,
+             case: `MINSAN Ltd., an unlisted company in South India, is engaged in the business of spice oil extraction. Total paid up capital of the company is 9 crore. The company is using conventional methods for extraction of oil from spices. This requires more human intervention and hence, the cost of production is high as compared to innovative method used by other new companies. Though the company had significant growth in the past years, it has not done well over the last two financial years due to competition. A new competitor viz, Natural Extracts Ltd, had come in the market during the year 2022 and by the end of March, 2023, they captured around 75% of market share by offering the product at a reduced price. In order to reduce cost of production and thereby re-capture the market, the management of MINSAN Ltd. has planned to erect a new plant with an automatic machine. The company approached SA Bank Ltd. for a term loan of 80 lakh. During the audit for the year 2023-24, the audit team submitted findings including a lawsuit by a material supplier (PX Ltd.) for ₹3 crore, a show cause notice from the State Pollution Control Board, and three instances of fraud by employees totaling ₹1.02 crore.`,
                 topic: "Going Concern (SA 570)",
                 question: "As per SA 570, which of the following audit procedures should NOT be performed to assess whether MINSAN Ltd is a going concern or not?",
                 options: { a: "Analysis and discussion with the management of the company to find out whether installation of new plant and machinery would enable the company to reduce the cost of production.", b: "Inquire the company's legal counsel regarding existence of legal litigation and claim against the company, reasonableness of management assessments of their outcome and estimate of their financial implication.", c: "Evaluating management's future plan and strategy to increase the market share of the product.", d: "Analysis and discuss the company's cash flow and profit of the previous years with the projected accounts." },
@@ -1473,12 +1419,11 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
         const submitBtn = document.getElementById('submit-btn');
-        const reviewBtn = document.getElementById('review-btn');
+        const reviewAllBtn = document.getElementById('review-all-btn');
+        const reviewMarkedBtn = document.getElementById('review-marked-btn');
         const restartBtn = document.getElementById('restart-btn');
         const newTestBtn = document.getElementById('new-test-btn');
-        const generateScenarioBtn = document.getElementById('generate-scenario-btn');
-        const getFeedbackBtn = document.getElementById('get-feedback-btn');
-
+        const markForReviewCheckbox = document.getElementById('mark-for-review-checkbox');
 
         const questionNumberEl = document.getElementById('question-number');
         const scoreEl = document.getElementById('score');
@@ -1492,8 +1437,7 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
         const reviewContentEl = document.getElementById('review-content');
         const totalQuestionsEl = document.getElementById('total-questions');
         const finalTotalScoreEl = document.getElementById('final-total-score');
-        const newScenarioContainer = document.getElementById('new-scenario-container');
-        const feedbackContainer = document.getElementById('feedback-container');
+        const topicPerformanceListEl = document.getElementById('topic-performance-list');
         const timerEl = document.getElementById('timer');
 
         // --- State ---
@@ -1503,10 +1447,7 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
         let quizSessionData = [];
         let timerInterval = null;
         let startTime = 0;
-
-        // --- Gemini API Configuration ---
-        const API_KEY = "AIzaSyAUmhfDgUhwJx6d0g6hTRhI8LSzwXy8v1U"; // This will be handled by the environment.
-        const API_URL_GEMINI = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${AIzaSyAUmhfDgUhwJx6d0g6hTRhI8LSzwXy8v1U}`;
+        let markedForReview = [];
 
         
         // --- Quiz Functions ---
@@ -1544,9 +1485,10 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
         function startQuiz() {
             const testSize = 15;
             const shuffledLibrary = shuffle([...quizData]);
-            quizSessionData = shuffledLibrary.slice(0, testSize); // Create a 15-question test for the session
+            quizSessionData = shuffledLibrary.slice(0, testSize);
             currentQuestionIndex = 0;
             userAnswers = new Array(quizSessionData.length).fill(null);
+            markedForReview = new Array(quizSessionData.length).fill(false);
             currentScore = 0;
             scoreEl.textContent = '0';
             totalQuestionsEl.textContent = testSize;
@@ -1565,6 +1507,7 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
             caseScenarioTextEl.textContent = questionData.case;
             questionTextEl.textContent = `${questionData.question}`;
             optionsContainerEl.innerHTML = '';
+            markForReviewCheckbox.checked = markedForReview[index];
 
             for (const key in questionData.options) {
                 const optionDiv = document.createElement('div');
@@ -1600,7 +1543,7 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
         
         function handleOptionSelect(questionIndex, selectedOption) {
             userAnswers[questionIndex] = selectedOption;
-            calculateScore(); // Update score live
+            calculateScore();
         }
 
         function updateNavigation() {
@@ -1635,7 +1578,7 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
 
         function showResults() {
             stopTimer();
-            calculateScore(); // Final calculation
+            calculateScore(); 
             const answeredQuestions = userAnswers.filter(a => a !== null).length;
             const maxPossibleScore = answeredQuestions * 2;
             
@@ -1644,17 +1587,49 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
             answeredCountEl.textContent = answeredQuestions;
             finalScoreEmojiEl.textContent = getScoreEmoji(currentScore, maxPossibleScore);
             
+            displayTopicPerformance();
+
             quizScreen.classList.add('hidden');
             resultScreen.classList.remove('hidden');
         }
 
-        function showReview() {
+        function displayTopicPerformance() {
+            const performance = {};
+            quizSessionData.forEach((question, index) => {
+                if (userAnswers[index] === null) return;
+
+                const topic = question.topic || 'General';
+                if (!performance[topic]) {
+                    performance[topic] = { correct: 0, total: 0 };
+                }
+                performance[topic].total++;
+                if (userAnswers[index] === question.answer) {
+                    performance[topic].correct++;
+                }
+            });
+
+            topicPerformanceListEl.innerHTML = '';
+            for (const topic in performance) {
+                const { correct, total } = performance[topic];
+                const percentage = Math.round((correct / total) * 100);
+                const topicDiv = document.createElement('div');
+                topicDiv.className = 'flex justify-between items-center bg-gray-700 p-3 rounded-lg';
+                topicDiv.innerHTML = `
+                    <span class="font-medium text-gray-300">${topic}</span>
+                    <span class="font-bold text-white">${correct} / ${total} (${percentage}%)</span>
+                `;
+                topicPerformanceListEl.appendChild(topicDiv);
+            }
+        }
+
+        function showReview(markedOnly = false) {
             resultScreen.classList.add('hidden');
             reviewScreen.classList.remove('hidden');
             reviewContentEl.innerHTML = '';
 
             quizSessionData.forEach((question, index) => {
-                if(userAnswers[index] === null) return; // Skip unanswered questions in review
+                if (userAnswers[index] === null) return;
+                if (markedOnly && !markedForReview[index]) return;
 
                 const userAnswer = userAnswers[index];
                 const correctAnswer = question.answer;
@@ -1686,12 +1661,8 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
                 reviewHTML += `
                     </div>
                     <div class="mt-4 pt-4 border-t border-gray-700">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-semibold text-green-400">Explanation:</h4>
-                            <button class="gemini-btn" onclick="getAlternativeExplanation(${index}, this)">✨ Explain Differently</button>
-                        </div>
+                        <h4 class="font-semibold text-green-400">Explanation:</h4>
                         <p class="text-gray-300 mt-1" id="reason-${index}">${question.reason}</p>
-                        <div class="text-gray-400 mt-2 text-sm" id="gemini-explanation-${index}"></div>
                     </div>
                 `;
 
@@ -1710,233 +1681,13 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
             userAnswers = [];
             currentScore = 0;
             quizSessionData = [];
+            markedForReview = [];
             scoreEl.textContent = '0';
             reviewScreen.classList.add('hidden');
             resultScreen.classList.add('hidden');
             startScreen.classList.remove('hidden');
-            feedbackContainer.classList.add('hidden');
-            newScenarioContainer.classList.add('hidden');
             timerEl.textContent = '00:00';
             if (timerInterval) clearInterval(timerInterval);
-        }
-
-        function toggleAnswer(id) {
-            const element = document.getElementById(id);
-            if (element) {
-                element.classList.toggle('hidden');
-            }
-        }
-
-        // --- Gemini API Functions ---
-
-        async function getAIFeedback() {
-            getFeedbackBtn.disabled = true;
-            feedbackContainer.classList.remove('hidden');
-            feedbackContainer.innerHTML = '<div class="loader"></div>';
-
-            const incorrectAnswers = quizSessionData.filter((_, index) => userAnswers[index] !== null && userAnswers[index] !== quizSessionData[index].answer);
-
-            if (incorrectAnswers.length === 0) {
-                feedbackContainer.innerHTML = '<p class="text-green-400 font-semibold">Congratulations! You answered all attempted questions correctly. Great job!</p>';
-                getFeedbackBtn.disabled = false;
-                return;
-            }
-
-            const topics = incorrectAnswers.map(q => q.topic).join(', ');
-            const prompt = `I am an auditing student. I took a multiple-choice test and got the following questions wrong. The topics covered in these questions were: ${topics}. 
-            
-            Please analyze my performance. 
-            1. Identify the key themes or concepts where I seem to be struggling.
-            2. Provide a brief, encouraging summary of my performance.
-            3. Suggest 2-3 specific areas or Auditing Standards (SAs) I should focus on for my revision.
-            
-            Keep the feedback concise and helpful.`;
-
-            try {
-                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-                const response = await fetch(API_URL_GEMINI, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
-                    // Simple markdown to HTML conversion
-                    let feedbackText = result.candidates[0].content.parts[0].text;
-                    feedbackText = feedbackText.replace(/\*\*(.*?)\*\*/g, '<strong class="text-purple-400">$1</strong>'); // Bold
-                    feedbackText = feedbackText.replace(/\n/g, '<br>'); // Newlines
-                    feedbackContainer.innerHTML = `<p>${feedbackText}</p>`;
-                } else {
-                    throw new Error("Invalid response structure from API");
-                }
-            } catch (error) {
-                console.error("Gemini API error:", error);
-                feedbackContainer.innerHTML = `<p class="text-red-400">Sorry, couldn't generate feedback right now.</p>`;
-            } finally {
-                getFeedbackBtn.disabled = false;
-            }
-        }
-
-        async function getAlternativeExplanation(index, button) {
-            const questionData = quizSessionData[index];
-            const explanationContainer = document.getElementById(`gemini-explanation-${index}`);
-            
-            button.disabled = true;
-            explanationContainer.innerHTML = '<div class="loader"></div>';
-
-            const prompt = `The following is an audit-related multiple-choice question, the correct answer, and the reason.
-            Question: "${questionData.question}"
-            Correct Answer: "${questionData.options[questionData.answer]}"
-            Reason: "${questionData.reason}"
-            Please explain the core concept behind this answer in a different way. Use an analogy or a simple example to make it easier to understand for a student. Keep it concise.`;
-
-            try {
-                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-                const response = await fetch(API_URL_GEMINI, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
-                    explanationContainer.innerHTML = `<p class="bg-gray-900 p-3 rounded-md border border-violet-500">${result.candidates[0].content.parts[0].text}</p>`;
-                } else {
-                    throw new Error("Invalid response structure from API");
-                }
-            } catch (error) {
-                console.error("Gemini API error:", error);
-                explanationContainer.innerHTML = `<p class="text-red-400">Sorry, couldn't generate an explanation right now.</p>`;
-            } finally {
-                button.disabled = false;
-            }
-        }
-
-        async function generateNewScenario() {
-            const topic = document.getElementById('topic-selector').value;
-            generateScenarioBtn.disabled = true;
-            newScenarioContainer.classList.remove('hidden');
-            newScenarioContainer.innerHTML = '<div class="loader"></div>';
-
-            const prompt = `You are an expert in creating educational content for advanced auditing students. Your task is to generate a practice problem.
-            First, create a new, detailed case scenario that mixes multiple concepts related to the primary audit topic of "${topic}".
-            Second, based on that single scenario, create an array of exactly 5 challenging multiple-choice questions.
-            Third, for each question, provide four options (a, b, c, d), the correct answer key (e.g., "c"), and a brief, clear reason for the correct answer.
-            Finally, you MUST return the entire output as a single, valid JSON object. Do not include any text or formatting outside of this JSON object. The JSON object must have these exact keys: "case" (a string for the scenario) and "questions" (an array of 5 question objects). Each question object in the array must have these exact keys: "question", "options" (an object with a,b,c,d keys), "answer", and "reason".`;
-            
-            const schema = {
-                type: "OBJECT",
-                properties: {
-                    "case": { "type": "STRING" },
-                    "questions": {
-                        type: "ARRAY",
-                        items: {
-                            type: "OBJECT",
-                            properties: {
-                                "question": { "type": "STRING" },
-                                "options": {
-                                    type: "OBJECT",
-                                    properties: {
-                                        "a": { "type": "STRING" },
-                                        "b": { "type": "STRING" },
-                                        "c": { "type": "STRING" },
-                                        "d": { "type": "STRING" }
-                                    }
-                                },
-                                "answer": { "type": "STRING" },
-                                "reason": { "type": "STRING" }
-                            }
-                        }
-                    }
-                }
-            };
-
-            try {
-                const payload = {
-                    contents: [{ role: "user", parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        responseMimeType: "application/json",
-                        responseSchema: schema
-                    }
-                };
-                const response = await fetch(API_URL_GEMINI, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                if (!response.ok) {
-                    let errorMsg = `API request failed with status ${response.status}.`;
-                    if(response.status === 403) {
-                        errorMsg += " This is often due to API key restrictions. Please check your key's permissions for the domain you are using (e.g., github.io).";
-                    }
-                    throw new Error(errorMsg);
-                }
-
-                const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
-                    const jsonText = result.candidates[0].content.parts[0].text;
-                    
-                    let generatedData;
-                    try {
-                        generatedData = JSON.parse(jsonText);
-                    } catch (parseError) {
-                         console.error("JSON Parsing Error:", parseError, "Received text:", jsonText);
-                         throw new Error("Failed to parse the AI-generated scenario. The response was not valid JSON.");
-                    }
-
-                    let scenarioHTML = `
-                        <h4 class="text-lg font-bold text-indigo-400 mb-2">New AI-Generated Case Scenario</h4>
-                        <p class="text-sm text-gray-300 mb-4">${generatedData.case}</p>
-                        <hr class="border-gray-600 my-4">
-                    `;
-                    
-                    if (generatedData.questions && Array.isArray(generatedData.questions)) {
-                        generatedData.questions.forEach((q, index) => {
-                             if(q && q.options && q.options.a && q.options.b && q.options.c && q.options.d){ // Check if question and options are valid
-                                scenarioHTML += `
-                                    <div class="my-4 p-4 bg-gray-800 rounded-lg">
-                                        <h5 class="font-semibold text-gray-200 mb-2">${index + 1}. ${q.question}</h5>
-                                        <div class="space-y-2 mb-2 text-sm">
-                                            <p class="p-2 bg-gray-700 rounded-md">a. ${q.options.a}</p>
-                                            <p class="p-2 bg-gray-700 rounded-md">b. ${q.options.b}</p>
-                                            <p class="p-2 bg-gray-700 rounded-md">c. ${q.options.c}</p>
-                                            <p class="p-2 bg-gray-700 rounded-md">d. ${q.options.d}</p>
-                                        </div>
-                                        <div class="pt-2">
-                                           <button onclick="toggleAnswer('gen-ans-${index}')" class="text-xs text-indigo-400 hover:underline">Show/Hide Answer</button>
-                                           <div id="gen-ans-${index}" class="hidden mt-2 text-sm">
-                                               <p class="font-semibold text-green-400">Correct Answer: ${q.answer.toUpperCase()}</p>
-                                               <p class="text-gray-400 mt-1">${q.reason}</p>
-                                           </div>
-                                        </div>
-                                    </div>
-                                `;
-                            }
-                        });
-                    } else {
-                        throw new Error("Generated JSON does not contain a 'questions' array.");
-                    }
-
-                    newScenarioContainer.innerHTML = scenarioHTML;
-
-                } else {
-                     let errorMessage = "Invalid response structure from API.";
-                     if (result.promptFeedback && result.promptFeedback.blockReason) {
-                         errorMessage = `Content generation was blocked. Reason: ${result.promptFeedback.blockReason}. Please try a different topic.`;
-                     } else if (result.candidates && result.candidates.length > 0 && result.candidates[0].finishReason !== 'STOP') {
-                         errorMessage = `Content generation stopped unexpectedly. Reason: ${result.candidates[0].finishReason}. Please try again.`;
-                     }
-                     throw new Error(errorMessage);
-                }
-            } catch (error) {
-                console.error("Gemini API error:", error);
-                newScenarioContainer.innerHTML = `<p class="text-red-400">Sorry, an error occurred while generating the scenario: ${error.message}. Please try again.</p>`;
-            } finally {
-                generateScenarioBtn.disabled = false;
-            }
         }
 
         // --- Event Listeners ---
@@ -1954,11 +1705,13 @@ case: "AI-Generated Case: During the audit of XYZ Ltd., the auditors noticed tha
             }
         });
         submitBtn.addEventListener('click', showResults);
-        reviewBtn.addEventListener('click', showReview);
+        reviewAllBtn.addEventListener('click', () => showReview(false));
+        reviewMarkedBtn.addEventListener('click', () => showReview(true));
         restartBtn.addEventListener('click', resetQuiz);
         newTestBtn.addEventListener('click', resetAndStart);
-        generateScenarioBtn.addEventListener('click', generateNewScenario);
-        getFeedbackBtn.addEventListener('click', getAIFeedback);
+        markForReviewCheckbox.addEventListener('change', () => {
+            markedForReview[currentQuestionIndex] = markForReviewCheckbox.checked;
+        });
         
     </script>
 </body>
